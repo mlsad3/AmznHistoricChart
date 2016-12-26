@@ -30,7 +30,7 @@ http://stackoverflow.com/a/5947280/277601
 	//     WAITING_FOR_PAGE_GENERATION - Ping again in 3 seconds
 	//     ANALYZING - Ping again in 3 seconds
 	//     NOT_ENOUGH_REVIEWS - Do not continue
-	//     DONE - Do not continue, should have product and company grade
+	//     DONE - Do not continue, should have product/company grade and Trustwerty rating
 	function pingForFakespotData(){
 		chrome.runtime.sendMessage({
 			method: 'GET',
@@ -130,6 +130,14 @@ http://stackoverflow.com/a/5947280/277601
 	}
 
 	var nwtcr_domAdditionsCount = 0;
+	/**
+	 * Waits until DOM changes have stopped before adding our modifications to the website.
+	 * When user changes product size/color/variant, parts of the page get deleted or recreated.
+	 * For this case, we wait until all changes have finished, then try adding our modifications
+	 * back in.
+	 *  - Wait some more if changes have happened recently
+	 *  - Wait some more if, after trying to add our modifications, they do not exist anymore
+	 * */
 	function onDomChange2(){
 		if (nwtcr_domAdditionsCount > 0){
 			nwtcr_domAdditionsCount = 0;
@@ -144,10 +152,21 @@ http://stackoverflow.com/a/5947280/277601
 		}
 	};
 
+	/**
+	 * Counts number of times nodes have been inserted into the document.
+	 * We are tracking this because we don't want to add our charts back in while page
+	 * is still getting created.
+	 * */
 	function countDocAdditions(){
 		nwtcr_domAdditionsCount += 1;
 	};
 
+	/**
+	 * When the CamelCamelCamel's ancestor node is removed from page, cleanup and remove 
+	 * all modifications we've made (makes it easier when adding them back in).
+	 * It is also important to get new images since the same product with a different
+	 * color/size will have a different CamelCamelCamel chart.
+	 * */
 	function onCamelRemove(){ 
 		var element = document.getElementById('MyMiniCamelChart');
 		if (element != null) {
@@ -161,6 +180,9 @@ http://stackoverflow.com/a/5947280/277601
 		setTimeout(function(){onDomChange2();}, 500);	
 	};
 
+	/**
+	 * Adds a link to page, as a child of a parent (with a specific Id, ClassName, or TagName)
+	 * */
 	function addLink(url, text, parentID, getBy) {
 	  var element;
 	  if (getBy == "id") {
@@ -191,6 +213,13 @@ http://stackoverflow.com/a/5947280/277601
 	  return true;
 	}
 
+	/**
+	 * Adds CamelCamelCamel image (linking to CamelCamelCamel).
+	 * Also adds listener, DOMNodeRemovedFromDocument, as the AddToCart gets regenerated whenever
+	 * customer selects a different color/size/variant within the same product. When this happens,
+	 * our modifications get removed, so we wait for a delay following the removal, and add them
+	 * back in.
+	 * */
 	function addLinkImg(url, imgUrl, imgTitle, divName, addListener, addTitle, afterSiblingNotAsChild, parentID, getBy, width, height) {
 	  var element;
 	  var siblingToPlaceBefore;
@@ -253,6 +282,9 @@ http://stackoverflow.com/a/5947280/277601
 	  return true;
 	}
 
+	/**
+	 * Gets the product ASIN (i.e. B01MRZIY0P)
+	 * */
 	function getASIN() {
 		var ASIN = "";
 		var asinElement = document.getElementById('ASIN');
@@ -268,6 +300,9 @@ http://stackoverflow.com/a/5947280/277601
 		return ASIN;
 	}
 
+	/**
+	 * Adds CamelCamelCamel graph and Fakespot results to Amazon webpage.
+	 * */
 	amznhc.addAmazonPriceGraph = function() {
 		// Check if it's already added:
 		if (isAlreadyAdded('MyMiniCamelChart')) {return;}
