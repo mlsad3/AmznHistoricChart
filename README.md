@@ -9,4 +9,5 @@ Adds a graph of the price history above the "Add to Cart" button in Amazon.
 Also integrates Fakespot results into Amazon page
  - Product & Company grades (A, B, C, D, F)
  - Trustwerty Rating (fixed stars)
+ - Clicking on the product/company grades or Trustwerty rating will take you to Fakespot.com to review the results
  - The Product/Company grades will go between CamelCamelCamel chart and the AddToCart button. The Trustwerty Rating stars will go to the right of the original Amazon rating stars
