@@ -27,7 +27,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, callback) {
 	
 	/**
 	 * Get image data from non-secure website (http) and pass back
-	 * http://stackoverflow.com/a/20711569/277601
+	 * http://stackoverflow.com/a/20285053/277601
 	 * */
 	amazoncamel.loadImageData = function(request, callback){
 		var img = new Image();
