@@ -185,14 +185,12 @@ http://stackoverflow.com/a/5947280/277601
 			callback(fsc);
 		};
 		// http://fakespot.com/analyze?utf8=%E2%9C%93&url=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE&commit=Analyze
-		var url = 'http://fakespot.com/analyze?utf8=%E2%9C%93&url=' + encodeURIComponent(fsc.amazonUrl) + '&commit=Analyze';
-		xhttp.open('GET', url, true);
+		fsc.productUrl = 'http://fakespot.com/analyze?utf8=%E2%9C%93&url=' + encodeURIComponent(fsc.amazonUrl) + '&commit=Analyze';
+		xhttp.open('GET', fsc.productUrl, true);
 		// setRequestHeader must be called *after* open
 		xhttp.setRequestHeader('Accept', '*/*;q=0.5, text/javascript, application/javascript, application/ecmascript, application/x-ecmascript');
 		xhttp.setRequestHeader('X-CSRF-Token', fsc.csrfToken);
 		xhttp.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-		// xhttp.setRequestHeader('DNT', '1');
-		// xhttp.setRequestHeader('Referer', 'http://fakespot.com/');
 		var formData = new FormData();
 		formData.append("utf8", "✓");
 		formData.append("url", fsc.amazonUrl);
@@ -248,8 +246,6 @@ http://stackoverflow.com/a/5947280/277601
 		};
 		xhttp.open('GET', 'http://fakespot.com/product_status/' + fsc.productId, true);
 		// setRequestHeader must be called *after* open
-		// xhttp.setRequestHeader('DNT', '1');
-		// xhttp.setRequestHeader('Referer', 'http://fakespot.com/');
 		if (fsc.ETag != ""){
 			xhttp.setRequestHeader('If-None-Match', fsc.ETag);
 		}
@@ -317,8 +313,6 @@ http://stackoverflow.com/a/5947280/277601
 		};
 		xhttp.open('GET', 'http://fakespot.com/analysis_status/' + fsc.productId, true);
 		// setRequestHeader must be called *after* open
-		// xhttp.setRequestHeader('DNT', '1');
-		// xhttp.setRequestHeader('Referer', 'http://fakespot.com/');
 		if (fsc.ETag != ""){
 			xhttp.setRequestHeader('If-None-Match', fsc.ETag);
 		}
@@ -409,8 +403,6 @@ http://stackoverflow.com/a/5947280/277601
 		};
 		xhttp.open('GET', fsc.productUrl, true);
 		// setRequestHeader must be called *after* open
-		// xhttp.setRequestHeader('DNT', '1');
-		// xhttp.setRequestHeader('Referer', 'http://fakespot.com/');
 		xhttp.setRequestHeader('Upgrade-Insecure-Requests', '1');
 		xhttp.setRequestHeader('Accept', '*/*;q=0.5, text/javascript, application/javascript, application/ecmascript, application/x-ecmascript');
 		xhttp.send();
