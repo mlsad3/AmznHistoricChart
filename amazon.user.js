@@ -163,7 +163,10 @@ http://stackoverflow.com/a/5947280/277601
 			element.id = 'MyMiniCamelChartRemoved';
 		}
 		removeElement('MyCamelChart');
+		removeElement('MyMiniCamelChart');
 		removeElement('MyCamelSalesRankChart');
+		removeElement('MyFakespotReport');
+		removeElement('MyTWStarsUpdate'); // TODO: Add MyTWStarsUpdate
 		nwtcr_domAdditionsCount = 0;
 		
 		document.documentElement.addEventListener('DOMNodeInsertedIntoDocument', countDocAdditions, false);
@@ -171,38 +174,42 @@ http://stackoverflow.com/a/5947280/277601
 	};
 
 	/**
-	 * Adds a link to page, as a child of a parent (with a specific Id, ClassName, or TagName)
+	 * Grabs location to put new node
+	 * Returns Hash:
+	 *   - found                : Bool - If location for new node was found
+	 *   - element              : Element - Location to insert new node into
+	 *   - siblingToPlaceBefore : Element - Child of element that item should be placed before (unless 'null')
 	 * */
-	function addLink(url, text, domNodeOptions) {
-	  var element;
-	  if (domNodeOptions.getBy == "id") {
-		element = document.getElementById(domNodeOptions.parentId);
-	  } else if (domNodeOptions.getBy == "class") {
-		var elements = document.getElementsByClassName(domNodeOptions.parentId);
-		if (elements.length == 0) return false;
-		element = elements[0];
-	  } else if (domNodeOptions.getBy == "tag") {
-		var elements = document.getElementsByTagName(domNodeOptions.parentId);
-		if (elements.length == 0) return false;
-		element = elements[0];
-	  }
-	  if (element == null) return false;
-
-	  var span = document.createElement('span');
-	  span.setAttribute('style', 'font-size : x-small');
-	  span.innerHTML = text;
-
-	  var label = document.createElement('a');
-	  label.setAttribute('class', 'nav_a');
-	  label.setAttribute('href', url);
-	  label.setAttribute('rel', 'noreferrer');
-	  label.appendChild(span);
-	  //console.log("found " + parentId);
-	  element.insertBefore(label, element.firstChild);
-	  //element.insertBefore(document.createElement('br'), element.firstChild);
-	  return true;
+	function getElementAndSibling(domNodeOptions){
+		var result = {
+			"found"                : false,
+			"element"              : null,
+			"siblingToPlaceBefore" : null
+		};
+		if (domNodeOptions.getBy == "id") {
+			result.element = document.getElementById(domNodeOptions.parentId);
+		} else if (domNodeOptions.getBy == "class") {
+			var elements = document.getElementsByClassName(domNodeOptions.parentId);
+			if (elements.length == 0) return result;
+			result.element = elements[0];
+		} else if (domNodeOptions.getBy == "tag") {
+			var elements = document.getElementsByTagName(domNodeOptions.parentId);
+			if (elements.length == 0) return result;
+			result.element = elements[0];
+		}
+		if (result.element == null) return result;
+		if (domNodeOptions.afterSiblingNotAsChild) {
+			result.siblingToPlaceBefore = result.element.nextSibling;
+			if (result.element != null) 
+				result.element = result.element.parentNode;
+			if (result.element == null) return result;
+		} else {
+			result.siblingToPlaceBefore = result.element.firstChild;
+		}
+		result.found = true;
+		return result;
 	}
-
+	
 	/**
 	 * Adds CamelCamelCamel image (linking to CamelCamelCamel).
 	 * Also adds listener, DOMNodeRemovedFromDocument, as the AddToCart gets regenerated whenever
@@ -210,65 +217,130 @@ http://stackoverflow.com/a/5947280/277601
 	 * our modifications get removed, so we wait for a delay following the removal, and add them
 	 * back in.
 	 * */
-	function addLinkImg(url, imgUrl, imgTitle, divName, width, height, domNodeOptions) {
-	  var element;
-	  var siblingToPlaceBefore;
-	  if (domNodeOptions.getBy == "id") {
-		element = document.getElementById(domNodeOptions.parentId);
-	  } else if (domNodeOptions.getBy == "class") {
-		var elements = document.getElementsByClassName(domNodeOptions.parentId);
-		if (elements.length == 0) return false;
-		element = elements[0];
-	  } else if (domNodeOptions.getBy == "tag") {
-		var elements = document.getElementsByTagName(domNodeOptions.parentId);
-		if (elements.length == 0) return false;
-		element = elements[0];
-	  }
-	  if (element == null) return false;
-	  if (domNodeOptions.afterSiblingNotAsChild) {
-		  siblingToPlaceBefore = element.nextSibling;
-		  if (element != null) 
-			  element = element.parentNode;
-		  if (element == null) return false;
-	  } else {
-		  siblingToPlaceBefore = element.firstChild;
-	  }
+	function addLinkImg(details, domNodeOptions) {
+	  var domLoc = getElementAndSibling(domNodeOptions);
+	  if (!domLoc.found) return false;
 
 	  var div = document.createElement('div');
-	  div.setAttribute('id', divName);
+	  div.setAttribute('id', details.nodeName);
+	  div.setAttribute('style', 'border-radius: 5px;padding: 6px;box-shadow: rgba(0, 120, 0, 0.2) 1px 2px 2px 0px; margin-bottom: 4px;');
 	  
 	  var label = document.createElement('a');
 	  label.setAttribute('class', 'nav_a');
-	  label.setAttribute('href', url);
+	  label.setAttribute('href', details.imgLink);
 	  label.setAttribute('rel', 'noreferrer');
+	  label.setAttribute('style', 'line-height:12px');
 	  
 	  var img = document.createElement('img');
-	  img.setAttribute('src', imgUrl);
-	  img.setAttribute('alt', imgTitle); // Alt if image does not exist
-	  img.setAttribute('title', imgTitle); // Title should make hover text
-	  img.setAttribute('width', width);
-	  img.setAttribute('height', height);
+	  label.appendChild(img);
+	  img.setAttribute('src', details.imgSrc);
+	  img.setAttribute('alt', details.imgTitle); // Alt if image does not exist
+	  img.setAttribute('title', details.imgTitle); // Title should make hover text
+	  img.setAttribute('width', details.imgWidth);
+	  img.setAttribute('height', details.imgHeight);
 
 	  if (domNodeOptions.addTitle) {
 		  var span = document.createElement('span');
 		  span.setAttribute('style', 'font-size : large; color : #9933ff;');
-		  span.innerHTML = imgTitle;
+		  var txt = document.createTextNode(details.imgTitle);
+		  span.appendChild(txt);
 
 		  div.appendChild(span);
 		  div.appendChild(document.createElement('br'));
 	  }
 	  div.appendChild(label);
 	  div.appendChild(document.createElement('br'));
-	  div.appendChild(document.createElement('br'));
-	  label.appendChild(img);
+	  
+	  if (details.linkText != null){
+		  var spanLink = document.createElement('span');
+		  spanLink.setAttribute('style', 'font-size : x-small');
+		  var txt = document.createTextNode(details.linkText);
+		  spanLink.appendChild(txt);
+
+		  label = document.createElement('a');
+		  label.setAttribute('class', 'nav_a');
+		  label.setAttribute('href', details.linkLink);
+		  label.setAttribute('rel', 'noreferrer');
+		  label.setAttribute('style', 'line-height:12px');
+		  label.appendChild(spanLink);
+		  
+		  div.appendChild(label);
+	  }
+	  
+	  //div.appendChild(document.createElement('br'));
 	  //console.log("found " + domNodeOptions.parentId);
-	  if (domNodeOptions.afterSiblingNotAsChild)
-		  element.insertBefore(div, siblingToPlaceBefore);
-	  else
-		  element.insertBefore(div, siblingToPlaceBefore);
+	  domLoc.element.insertBefore(div, domLoc.siblingToPlaceBefore);
 	  
 	  if (domNodeOptions.addListener) div.addEventListener('DOMNodeRemovedFromDocument', onCamelRemove, false);
 
+	  return true;
+	}
+
+	/**
+	 * Adds Fakespot Grade Report and link to Fakespot product page.
+	 * */
+	function addFakespotReport(results, domNodeOptions) {
+		// url, imgUrl, imgTitle, divName
+	  var domLoc = getElementAndSibling(domNodeOptions);
+	  if (!domLoc.found) return false;
+
+	  console.log("Trying to add FSR");
+	  var fsDiv = document.createElement('div');
+	  fsDiv.setAttribute('id', "MyFakespotReport");
+	  fsDiv.setAttribute('style', 'text-decoration: none; color: rgb(94, 170, 241); font-weight: 500; text-align: center; border-radius: 5px; box-shadow: rgba(0, 120, 0, 0.2) 1px 2px 2px 0px; background-color: rgb(255, 255, 255); position: relative; margin-bottom: 4px;padding:4px');
+	  
+	  var table = document.createElement('table');
+	  fsDiv.appendChild(table);
+	  var tbody = document.createElement('tbody');
+	  table.appendChild(tbody);
+	  
+	  //// Fakespot(tm) Grade
+	  var tr, td, div, txt, span;
+	  tr = document.createElement('tr');
+	  tbody.appendChild(tr);
+	  tr.setAttribute('style', 'padding:0px;margin-bottom:0px;');
+	  td = document.createElement('td');
+	  tr.appendChild(td);
+	  td.setAttribute('colspan', '3');
+	  td.setAttribute('style', 'padding:0px;margin-bottom:0px;');
+	  div = document.createElement('div');
+	  td.appendChild(div);
+	  div.setAttribute('style', 'font-size:11px;line-height:11px;font-weight:700;color:#145d73;text-decoration:none;');
+	  txt = document.createTextNode("Fake");
+	  div.appendChild(txt);
+	  span = document.createElement("span");
+	  div.appendChild(span);
+	  txt = document.createTextNode("spot™ Grade");
+	  span.appendChild(txt);
+	  span.setAttribute('style', 'color:#63b0f4');
+	  
+	  // var label = document.createElement('a');
+	  // label.setAttribute('class', 'nav_a');
+	  // label.setAttribute('href', url);
+	  // label.setAttribute('rel', 'noreferrer');
+	  // 
+	  // var img = document.createElement('img');
+	  // img.setAttribute('src', imgUrl);
+	  // img.setAttribute('alt', imgTitle); // Alt if image does not exist
+	  // img.setAttribute('title', imgTitle); // Title should make hover text
+	  // img.setAttribute('width', width);
+	  // img.setAttribute('height', height);
+      // 
+	  // if (domNodeOptions.addTitle) {
+		 //  var span = document.createElement('span');
+		 //  span.setAttribute('style', 'font-size : large; color : #9933ff;');
+		 //  span.innerHTML = imgTitle;
+      // 
+		 //  fsDiv.appendChild(span);
+		 //  fsDiv.appendChild(document.createElement('br'));
+	  // }
+	  // fsDiv.appendChild(label);
+	  // fsDiv.appendChild(document.createElement('br'));
+	  // fsDiv.appendChild(document.createElement('br'));
+	  // label.appendChild(img);
+	  //console.log("found " + domNodeOptions.parentId);
+	  domLoc.element.insertBefore(fsDiv, domLoc.siblingToPlaceBefore);
+	  
 	  return true;
 	}
 
@@ -341,19 +413,6 @@ http://stackoverflow.com/a/5947280/277601
 				{"afterSiblingNotAsChild":false, "parentId":'title',                     "getBy":"id"},
 				{"afterSiblingNotAsChild":false, "parentId":'parseasinTitle',            "getBy":"class"}
 				);
-			var domNodeOptionsForCamelLink = [];
-			domNodeOptionsForCamelLink.push(
-				{"parentId":'buybox',              "getBy":"id"},
-				{"parentId":'buy-box_feature_div', "getBy":"id"},
-				{"parentId":'dmusic_buy_box',      "getBy":"id"},
-				{"parentId":'buy',                 "getBy":"class"},
-				{"parentId":'buying',              "getBy":"class"},
-				// These should be a last-check since it puts it in wrong spot for other pages like http://www.amazon.com/gp/product/B00U3FPN4U
-				{"parentId":'price_feature_div',   "getBy":"id"},
-				// Page example: Baby K'tan Original Baby Carrier amazon.com/dp/B00FSKX266
-				{"parentId":'buybox_feature_div',  "getBy":"id"},
-				{"parentId":'buybox',              "getBy":"data-feature-name"}
-				);
 			var domNodeOptionsForMiniCamelGraph = [];
 			domNodeOptionsForMiniCamelGraph.push(
 				// Page example: Electric shavers (or deal of the day) (which was once http://www.amazon.com/gp/product/B003YJAZZ4 )
@@ -381,38 +440,66 @@ http://stackoverflow.com/a/5947280/277601
 				//    This should NOT use title_feature_div, since it has a css max-height:55px. Instead, put it at the same level but just AFTER
 				
 				/*	// Camel Historic Sales Rank graphs -- Do not enable until we add settings page
+				 *	var camelSalesDetails = {
+				 *		'imgLink'   : strCamelSalesRankLink,
+				 *		'imgSrc'    : imgLargeSalesRankLoc,
+				 *		'imgTitle'  : "Historical Sales Rank",
+				 *		'imgWidth'  : 500,
+				 *		'imgHeight' : 250,
+				 *		'linkLink'  : null,
+				 *		'linkText'  : null,
+				 *		'nodeName'  : 'MyCamelSalesRankChart'
+				 *	};
 				 *	for (var i = 0; i < domNodeOptionsForLargeSalesRankGraph.length; i++){
 				 *		domNodeOptionsForLargeSalesRankGraph[i].addListener = false;
 				 *		domNodeOptionsForLargeSalesRankGraph[i].addTitle    = true;
 				 *		// console.info("Camel Historic Sales Rank graphs - trying " + domNodeOptionsForLargeSalesRankGraph[i].parentId);
 				 *		// Wait for settings page before adding sales rank
-				 *		res = addLinkImg(strCamelSalesRankLink, imgLargeSalesRankLoc, "Historical Sales Rank",
-				 *				'MyCamelSalesRankChart', 500, 250, domNodeOptionsForLargeSalesRankGraph[i]);
+				 *		res = addLinkImg(camelSalesDetails, domNodeOptionsForLargeSalesRankGraph[i]);
 				 *		if (res) break;
 				 *	}
 				 * */
 				
 				
+				var camelLargeDetails = {
+					'imgLink'   : strCamelLink,
+					'imgSrc'    : imgLargeLoc,
+					'imgTitle'  : "HistoricPriceShopper - Click to go to CamelCamelCamel",
+					'imgWidth'  : 500,
+					'imgHeight' : 400,
+					'linkLink'  : null,
+					'linkText'  : null,
+					'nodeName'  : 'MyCamelChart'
+				};
 				// Camel Historic price graph
 				for (var i = 0; i < domNodeOptionsForLargeCamelGraph.length; i++){
 					domNodeOptionsForLargeCamelGraph[i].addListener = false;
 					domNodeOptionsForLargeCamelGraph[i].addTitle    = false;
 					// console.info("Camel Large Historic price graph - trying " + domNodeOptionsForLargeCamelGraph[i].parentId);
-					res = addLinkImg(strCamelLink, imgLargeLoc, "HistoricPriceShopper - Click to go to CamelCamelCamel",
-							'MyCamelChart', 500, 400, domNodeOptionsForLargeCamelGraph[i]);
+					res = addLinkImg(camelLargeDetails, domNodeOptionsForLargeCamelGraph[i]);
 					if (res) break;
 				}
 			}
 
-			finished = false;
-			// Camel goto-link
-			// Different sections of Amazon have different html, and so I need to
-			// try to add the Historical Data to multiple locations (once one works, quit)
-			for (var i = 0; i < domNodeOptionsForCamelLink.length; i++){
-				// console.info("Camel link - trying " + domNodeOptionsForCamelLink[i].parentId);
-				res = addLink(strCamelLink, "Track at CamelCamelCamel", domNodeOptionsForCamelLink[i]);
+			var results;
+			// Add Fakespot results
+			pingForFakespotData();
+			for (var i = 0; i < domNodeOptionsForMiniCamelGraph.length; i++){
+				// console.log("Got here for " + domNodeOptionsForMiniCamelGraph[i].parentId);
+				res = addFakespotReport(results, domNodeOptionsForMiniCamelGraph[i]);
 				if (res) break;
 			}
+			
+			var camelDetails = {
+				'imgLink'   : strNewALink,
+				'imgSrc'    : imgSmallLoc,
+				'imgTitle'  : "Click to see larger image - HistoricPriceShopper",
+				'imgWidth'  : 175,
+				'imgHeight' : 100,
+				'linkLink'  : strCamelLink,
+				'linkText'  : "Track at CamelCamelCamel",
+				'nodeName'  : 'MyMiniCamelChart'
+			};
 			
 			// Camel Historic price mini-graph
 			for (var i = 0; i < domNodeOptionsForMiniCamelGraph.length; i++){
@@ -420,13 +507,9 @@ http://stackoverflow.com/a/5947280/277601
 				domNodeOptionsForMiniCamelGraph[i].addTitle               = false;
 				domNodeOptionsForMiniCamelGraph[i].afterSiblingNotAsChild = false;
 				// console.info("Camel Historic price mini-graph - trying " + domNodeOptionsForMiniCamelGraph[i].parentId);
-				res = addLinkImg(strNewALink, imgSmallLoc, "Click to see larger image - HistoricPriceShopper",
-						'MyMiniCamelChart', 175, 100, domNodeOptionsForMiniCamelGraph[i]);
+				res = addLinkImg(camelDetails, domNodeOptionsForMiniCamelGraph[i]);
 				if (res) break;
 			}
-			
-			// Add Fakespot results
-			pingForFakespotData();
 		} else {
 			//console.log("Didn't find Amazon stuff");
 		}
