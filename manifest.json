@@ -36,6 +36,12 @@
   ],
   "permissions": [
     "http://fakespot.com/",
-    "http://*.fakespot.com/"
+    "http://*.fakespot.com/",
+    "https://fakespot.com/",
+    "https://*.fakespot.com/",
+    "http://camelcamelcamel.com/",
+    "http://*.camelcamelcamel.com/",
+    "https://camelcamelcamel.com/",
+    "https://*.camelcamelcamel.com/"
   ]
 }

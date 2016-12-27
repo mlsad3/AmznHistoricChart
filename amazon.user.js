@@ -173,6 +173,19 @@ http://stackoverflow.com/a/5947280/277601
 		setTimeout(function(){onDomChange2();}, 500);	
 	};
 
+	function pingForCamelImage(nodeId, camelUrl){
+		chrome.runtime.sendMessage({
+			action: 'camelimage_xhttp',
+			url: camelUrl
+		}, function(result) {
+			var node = document.getElementById(nodeId);
+			if (node != null && result != null) {
+				node.src = result; //window.URL.createObjectURL(result);
+				node.setAttribute('style', 'visibility:visible');
+			}
+		});
+	}
+
 	/**
 	 * Grabs location to put new node
 	 * Returns Hash:
@@ -233,11 +246,15 @@ http://stackoverflow.com/a/5947280/277601
 	  
 	  var img = document.createElement('img');
 	  label.appendChild(img);
-	  img.setAttribute('src', details.imgSrc);
+	  var imgId = details.nodeName+"_img";
+	  img.setAttribute('id', imgId);
+	  // Set image to 1x1 blank pixel for now
+	  img.setAttribute('src', 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==');
 	  img.setAttribute('alt', details.imgTitle); // Alt if image does not exist
 	  img.setAttribute('title', details.imgTitle); // Title should make hover text
 	  img.setAttribute('width', details.imgWidth);
 	  img.setAttribute('height', details.imgHeight);
+	  img.setAttribute('style', 'visibility:hidden');
 
 	  if (domNodeOptions.addTitle) {
 		  var span = document.createElement('span');
@@ -270,7 +287,7 @@ http://stackoverflow.com/a/5947280/277601
 	  //div.appendChild(document.createElement('br'));
 	  //console.log("found " + domNodeOptions.parentId);
 	  domLoc.element.insertBefore(div, domLoc.siblingToPlaceBefore);
-	  
+	  pingForCamelImage(imgId, details.imgSrc);
 	  if (domNodeOptions.addListener) div.addEventListener('DOMNodeRemovedFromDocument', onCamelRemove, false);
 
 	  return true;
@@ -284,7 +301,6 @@ http://stackoverflow.com/a/5947280/277601
 	  var domLoc = getElementAndSibling(domNodeOptions);
 	  if (!domLoc.found) return false;
 
-	  console.log("Trying to add FSR");
 	  var fsDiv = document.createElement('div');
 	  fsDiv.setAttribute('id', "MyFakespotReport");
 	  fsDiv.setAttribute('style', 'text-decoration: none; color: rgb(94, 170, 241); font-weight: 500; text-align: center; border-radius: 5px; box-shadow: rgba(0, 120, 0, 0.2) 1px 2px 2px 0px; background-color: rgb(255, 255, 255); position: relative; margin-bottom: 4px;padding:4px');
