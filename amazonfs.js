@@ -22,17 +22,23 @@ http://stackoverflow.com/a/5947280/277601
 		var fsc = fakespotCache.get(amazonUrl);
 		if (fsc == null) {
 			fsc = {
-				"amazonUrl"       : amazonUrl,
-				"productUrl"      : "",
-				"productId"       : "",
-				"ETag"            : "",
-				"status"          : amazonfs.StatusEnum.NONE,
-				"analysisPercent" : 0,
-				"analysisNotes"   : "",
-				"productGrade"    : "?",
-				"companyGrade"    : "?",
-				"analysisAge"     : "new",
-				"twStars"         : -1
+				"amazonUrl"         : amazonUrl,
+				"productUrl"        : "",
+				"productId"         : "",
+				"ETag"              : "",
+				"status"            : amazonfs.StatusEnum.NONE,
+				"analysisPercent"   : 0,
+				"analysisNotes"     : "",
+				"productGrade"      : "?",
+				"productGradeNotes" : null,
+				"productName"       : "",
+				"companyGrade"      : "?",
+				"companyGradeNotes" : null,
+				"companyName"       : "",
+				"companyGradeUrl"   : null,
+				"analysisAge"       : "new",
+				"twStarsUrl"        : null,
+				"twStars"           : -1
 				};
 			fakespotCache.set(amazonUrl, fsc);
 		}
@@ -366,6 +372,31 @@ http://stackoverflow.com/a/5947280/277601
 				if (resultTWStar != null && resultTWStar.length > 1){
 					var myTWStar = parseFloat(resultTWStar[1]);
 					fsc.twStars = myTWStar;
+				}
+				
+				// itemprop="name">General Hydroponics GH1514 Ph Control Kit</span>
+				var myProductNameRe = /itemprop="name">([^<]+)/i;
+				var resultProductName = myProductNameRe.exec(xhttp.responseText);
+				if (resultProductName != null && resultProductName.length > 1){
+					if (debug) console.log("Found productName: " + resultProductName);
+					fsc.productName = resultProductName[1];
+				}
+				
+				// https://trustwerty.com/product/
+				var myTwStarsUrl = /(https:\/\/trustwerty.com\/product[^"]+)/i;
+				var resultTwStarsUrl = myTwStarsUrl.exec(xhttp.responseText);
+				if (resultTwStarsUrl != null && resultTwStarsUrl.length > 1){
+					if (debug) console.log("Found twStarsUrl: " + resultTwStarsUrl);
+					fsc.twStarsUrl = resultTwStarsUrl[1];
+				}
+				
+				// company-label">Sold by&nbsp;<a class="link-highlight" href="/company/general-hydroponics">General Hydroponics</a>
+				var myCompanyNameRe = /company-label">Sold by[^<]+<[^>]+href="(\/company\/[^"]+)">([^<]+)/i;
+				var resultCompanyName = myCompanyNameRe.exec(xhttp.responseText);
+				if (resultCompanyName != null && resultCompanyName.length > 2){
+					if (debug) console.log("Found companyName: " + resultCompanyName);
+					fsc.companyGradeUrl = 'http://fakespot.com' + resultCompanyName[1];
+					fsc.companyName = resultCompanyName[2];
 				}
 				
 				var myAnalysisAgeRe = /reanalyze-analysis-msg/i;

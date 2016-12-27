@@ -20,3 +20,4 @@ Right now the organization is ugly.
  - jquery - not being used currently
  - frame.html - I originally thought I would be adding this as an iframe to amazon page. Probably not anymore.
  - *.png - The images used when adding to the Chrome Extension store
+ 

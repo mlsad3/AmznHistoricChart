@@ -31,9 +31,6 @@
       "js": ["jquery-2.1.4.min.js", "lru.js", "amazonfs.js", "amazon.user.js"]
     }
   ],
-  "web_accessible_resources": [
-    "frame.html"
-  ],
   "permissions": [
     "http://fakespot.com/",
     "http://*.fakespot.com/",

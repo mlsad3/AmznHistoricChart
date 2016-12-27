@@ -64,43 +64,6 @@ http://stackoverflow.com/a/5947280/277601
 		});
 	}
 
-	function UpdateFakespotDetails(result){
-		// TODO:
-		// Create element if it doesn't exist, below the graph
-		// 
-		switch(result.status){
-			case amazonfs.StatusEnum.WAITING_FOR_PAGE_GENERATION:
-				break;
-			case amazonfs.StatusEnum.ANALYZING:
-				break;
-			case amazonfs.StatusEnum.NOT_ENOUGH_REVIEWS:
-				break;
-			case amazonfs.StatusEnum.DONE:
-				break;
-			default:
-				// Do nothing
-				break;
-		}
-		// iframe of frame.html
-		// var iframe = document.createElement('iframe');
-		// // Must be declared at web_accessible_resources in manifest.json
-		// iframe.src = chrome.runtime.getURL('frame.html');
-		// 
-		// // Some styles for a fancy sidebar
-		// iframe.style.cssText = 'position:fixed;top:0;left:0;display:block;' +
-		//                        'width:300px;height:100%;z-index:1000;';
-		// // document.body.appendChild(iframe);
-	
-		// iframe of responseText
-		// var iframe = document.createElement('iframe');
-		// iframe.srcdoc = this.responseText;
-		// iframe.src = "data:text/html;charset=utf-8," + escape(this.responseText);
-		// // iframe.style.cssText = 'position:fixed;top:0;left:0;display:block;' +
-		// //                        'width:300px;height:100%;z-index:1000;';
-		// document.body.appendChild(iframe);
-		// alert(responseText);
-	}
-
 	function isAlreadyAdded(elementName){
 	  var element = document.getElementById(elementName);
 	  return element != null;
@@ -294,6 +257,19 @@ http://stackoverflow.com/a/5947280/277601
 	}
 
 	/**
+	 * Returns the color for a given Fakespot Grade
+	 * */
+	function getFakespotGradeColor(grade){
+		return (grade == "a") ? "#7ED321" :
+		       (grade == "b") ? "#3b93e3" :
+		       (grade == "c") ? "#ffb100" :
+		       (grade == "d") ? "#ffb100" :
+		       (grade == "f") ? "#8B0000" :
+		       (grade == "?") ? "#e2e2e2" :
+		       "#c2c2c2";
+	}
+	
+	/**
 	 * Adds Fakespot Grade Report and link to Fakespot product page.
 	 * */
 	function addFakespotReport(results, domNodeOptions) {
@@ -304,6 +280,21 @@ http://stackoverflow.com/a/5947280/277601
 	  var fsDiv = document.createElement('div');
 	  fsDiv.setAttribute('id', "MyFakespotReport");
 	  fsDiv.setAttribute('style', 'text-decoration: none; color: rgb(94, 170, 241); font-weight: 500; text-align: center; border-radius: 5px; box-shadow: rgba(0, 120, 0, 0.2) 1px 2px 2px 0px; background-color: rgb(255, 255, 255); position: relative; margin-bottom: 4px;padding:4px');
+	  domLoc.element.insertBefore(fsDiv, domLoc.siblingToPlaceBefore);
+	  UpdateFakespotDetails(results);
+	  return true;
+	}
+	
+	/**
+	 * Finds current Fakespot Report and replaces it with up-to-date values
+	 * */
+	function UpdateFakespotDetails(results){
+	  var fsDiv = document.getElementById("MyFakespotReport");
+	  if (fsDiv == null) return;
+	  
+	  // Delete everything inside
+	  while (fsDiv.firstChild)
+		  fsDiv.removeChild(fsDiv.firstChild);
 	  
 	  var table = document.createElement('table');
 	  fsDiv.appendChild(table);
@@ -311,7 +302,7 @@ http://stackoverflow.com/a/5947280/277601
 	  table.appendChild(tbody);
 	  
 	  //// Fakespot(tm) Grade
-	  var tr, td, div, txt, span;
+	  var tr, td, div, txt, span, color, hoverText;
 	  tr = document.createElement('tr');
 	  tbody.appendChild(tr);
 	  tr.setAttribute('style', 'padding:0px;margin-bottom:0px;');
@@ -329,6 +320,158 @@ http://stackoverflow.com/a/5947280/277601
 	  txt = document.createTextNode("spot™ Grade");
 	  span.appendChild(txt);
 	  span.setAttribute('style', 'color:#63b0f4');
+
+	//	switch(results.status){
+	//		case amazonfs.StatusEnum.WAITING_FOR_PAGE_GENERATION:
+	//			break;
+	//		case amazonfs.StatusEnum.ANALYZING:
+	//			break;
+	//		case amazonfs.StatusEnum.NOT_ENOUGH_REVIEWS:
+	//			break;
+	//		case amazonfs.StatusEnum.DONE:
+	//			break;
+	//		default:
+	//			// Do nothing
+	//			break;
+	//	}
+
+	  tr = document.createElement('tr');
+	  tbody.appendChild(tr);
+	  
+	  //// Product Grade
+	  td = document.createElement('td');
+	  tr.appendChild(td);
+	  if (results.status == amazonfs.StatusEnum.WAITING_FOR_PAGE_GENERATION){
+		  hoverText = "This is a product that Fakespot has not analyzed yet.\r\n" +
+		              "Please wait while analysis happens or click to\r\n" +
+					  "visit Fakespot.com for a detailed report.";
+	  } else if (results.status == amazonfs.StatusEnum.ANALYZING){
+		  hoverText = "Fakespot is analyzing this product's comments\r\n" +
+		              "\tStatus: " + results.analysisPercent + "% complete.\r\n" +
+		              "\t" + results.analysisNotes + "\r\n\r\n" +
+					  "Visit Fakespot.com for a detailed report!";
+	  } else if (results.status == amazonfs.StatusEnum.NOT_ENOUGH_REVIEWS){
+		  hoverText = "This product does not have enough reviews for\r\n" +
+		              "Fakespot to analyze.";
+	  } else {
+		  hoverText = "Product: " + results.productName + "\r\n\r\n" +
+		              "\tThis product's reviews got a trustworthiness\r\n" +
+					  "\tgrade of '" + results.productGrade.toUpperCase() + "' based on an analysis by\r\n" +
+		              "\tFakespot.com.\r\n" +
+		              "\ti.e. \"Are there a lot of fake reviews?\"\r\n\r\n" +
+					  "Visit Fakespot.com for a detailed report!";
+	  }
+	  td.setAttribute('title', hoverText);
+	  if (results.productUrl != null){
+		  td.setAttribute('onclick', "window.open('" + results.productUrl + "')");
+		  td.setAttribute('style', 'cursor: pointer;width:30%;');
+	  } else {
+		  td.setAttribute('style', 'width:30%;');
+	  }
+	  div = document.createElement('div');
+	  td.appendChild(div);
+	  color = getFakespotGradeColor(results.productGrade);
+	  div.setAttribute('style', 'border:1px solid ' + color + ';border-radius: 5px;color:' + color + ';background-color:#FFFFFF;font-size:22px;line-height:25px;font-weight:700;text-decoration:none;');
+	  txt = document.createTextNode(results.productGrade.toUpperCase());
+	  div.appendChild(txt);
+	  div = document.createElement('div');
+	  td.appendChild(div);
+	  div.setAttribute('style', 'font-weight:400;font-size:10px;line-height:12px;text-decoration:none;');
+	  txt = document.createTextNode("Product");
+	  div.appendChild(txt);
+	  
+	  //// Company Grade
+	  td = document.createElement('td');
+	  tr.appendChild(td);
+	  if (results.status == amazonfs.StatusEnum.WAITING_FOR_PAGE_GENERATION){
+		  hoverText = "This is a company Fakespot has not analyzed yet.\r\n" +
+		              "Please wait while analysis happens or click to\r\n" +
+					  "visit Fakespot.com for a detailed report.";
+	  } else if (results.status == amazonfs.StatusEnum.ANALYZING){
+		  hoverText = "Fakespot is analyzing this product's comments\r\n" +
+		              "\tStatus: " + results.analysisPercent + "% complete.\r\n" +
+		              "\t" + results.analysisNotes + "\r\n\r\n" +
+					  "Visit Fakespot.com for a detailed report!";
+	  } else if (results.status == amazonfs.StatusEnum.NOT_ENOUGH_REVIEWS){
+		  hoverText = "This company's product does not have enough reviews\r\n" +
+		              "for Fakespot to analyze.";
+	  } else {
+		  hoverText = "Company: " + results.companyName + "\r\n\r\n" +
+		              "\tThis company got a '" + results.companyGrade.toUpperCase() + "' grade based on the\r\n" +
+		              "\ttrustability of all of its products' comments.\r\n" +
+		              "\ti.e. \"Is the company funding a lot of fake reviews?\"\r\n\r\n" +
+					  "Visit Fakespot.com for a detailed report on this company!";
+	  }
+	  td.setAttribute('title', hoverText);
+	  if (results.companyGradeUrl != null){
+		  td.setAttribute('onclick', "window.open('" + results.companyGradeUrl + "')");
+		  td.setAttribute('style', 'cursor: pointer;width:30%;');
+	  } else {
+		  td.setAttribute('style', 'width:30%;');
+	  }
+	  div = document.createElement('div');
+	  td.appendChild(div);
+	  color = getFakespotGradeColor(results.companyGrade);
+	  div.setAttribute('style', 'border:1px solid ' + color + ';border-radius: 5px;color:' + color + ';background-color:#FFFFFF;font-size:22px;line-height:25px;font-weight:700;text-decoration:none;');
+	  txt = document.createTextNode(results.companyGrade.toUpperCase());
+	  div.appendChild(txt);
+	  div = document.createElement('div');
+	  td.appendChild(div);
+	  div.setAttribute('style', 'font-weight:400;font-size:10px;line-height:12px;text-decoration:none;');
+	  txt = document.createTextNode("Company");
+	  div.appendChild(txt);
+	  
+	  //// Trustwerty - I'm not sure if every product has a score. It seems like I've seen some without.
+	  if (results.twStars >0){
+		  td = document.createElement('td');
+		  tr.appendChild(td);
+		  if (results.status == amazonfs.StatusEnum.WAITING_FOR_PAGE_GENERATION){
+			  hoverText = "This is a company Fakespot has not analyzed yet.\r\n" +
+						  "Please wait while analysis happens or click to\r\n" +
+						  "visit Fakespot.com for a detailed report.";
+		  } else if (results.status == amazonfs.StatusEnum.ANALYZING){
+			  hoverText = "Fakespot is analyzing this product's comments\r\n" +
+						  "\tStatus: " + results.analysisPercent + "% complete.\r\n" +
+						  "\t" + results.analysisNotes + "\r\n\r\n" +
+						  "Visit Fakespot.com for a detailed report!";
+		  } else if (results.status == amazonfs.StatusEnum.NOT_ENOUGH_REVIEWS){
+			  hoverText = "This company's product does not have enough reviews\r\n" +
+						  "for Fakespot or Trustwerty to analyze.";
+		  } else {
+			  hoverText = "Product: " + results.productName + "\r\n\r\n" +
+						  "\tAfter removing the suspicious reviews, Trustwerty\r\n" +
+						  "\trecalculated the reviews to be " + results.twStars + " stars.\r\n\r\n" +
+						  "Visit Trustwerty.com for a detailed report of the comments!";
+		  }
+		  td.setAttribute('title', hoverText);
+		  if (results.twStarsUrl != null){
+			  td.setAttribute('onclick', "window.open('" + results.twStarsUrl + "')");
+			  td.setAttribute('style', 'cursor: pointer;width:40%;');
+		  } else {
+			  td.setAttribute('style', 'width:30%;');
+		  }
+		  div = document.createElement('div');
+		  td.appendChild(div);
+		  color = getFakespotGradeColor(results.companyGrade);
+		  div.setAttribute('style', 'border:1px solid rgba(0,0,0,0);border-radius: 5px;font-size:20px;line-height:25px;font-weight:700;text-decoration:none;');
+		  txt = document.createTextNode(results.twStars);
+		  div.appendChild(txt);
+		  span = document.createElement("span");
+		  div.appendChild(span);
+		  txt = document.createTextNode(" Stars");
+		  span.appendChild(txt);
+		  span.setAttribute('style', 'font-size:13px;');
+		  div = document.createElement('div');
+		  td.appendChild(div);
+		  div.setAttribute('style', 'font-weight:400;font-size:10px;line-height:12px;color:#1560a1;text-decoration:none;');
+		  txt = document.createTextNode("Trust");
+		  div.appendChild(txt);
+		  span = document.createElement("span");
+		  div.appendChild(span);
+		  txt = document.createTextNode("werty™");
+		  span.appendChild(txt);
+		  span.setAttribute('style', 'color:#64b5f6;');
+	  }
 	  
 	  // var label = document.createElement('a');
 	  // label.setAttribute('class', 'nav_a');
@@ -355,7 +498,6 @@ http://stackoverflow.com/a/5947280/277601
 	  // fsDiv.appendChild(document.createElement('br'));
 	  // label.appendChild(img);
 	  //console.log("found " + domNodeOptions.parentId);
-	  domLoc.element.insertBefore(fsDiv, domLoc.siblingToPlaceBefore);
 	  
 	  return true;
 	}
@@ -497,8 +639,22 @@ http://stackoverflow.com/a/5947280/277601
 				}
 			}
 
-			var results;
-			// Add Fakespot results
+			var results = {
+				"productUrl"        : "",
+				"status"            : amazonfs.StatusEnum.NONE,
+				"analysisPercent"   : 0,
+				"analysisNotes"     : "",
+				"productGrade"      : "?",
+				"productGradeNotes" : null,
+				"productName"       : "",
+				"companyGrade"      : "?",
+				"companyGradeNotes" : null,
+				"companyName"       : "",
+				"companyGradeUrl"   : null,
+				"analysisAge"       : "new",
+				"twStarsUrl"        : null,
+				"twStars"           : -1
+				};			// Add Fakespot results
 			pingForFakespotData();
 			for (var i = 0; i < domNodeOptionsForMiniCamelGraph.length; i++){
 				// console.log("Got here for " + domNodeOptionsForMiniCamelGraph[i].parentId);
