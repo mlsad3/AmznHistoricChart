@@ -322,58 +322,25 @@ http://stackoverflow.com/a/5947280/277601
 			var imgLargeLoc = encodeURI("http://charts.camelcamelcamel.com/us/" + ASIN + "/amazon.png?force=1&zero=0&w=500&h=400&desired=false&legend=1&ilt=1&tp=all&fo=0&lang=en");
 			var imgLargeSalesRankLoc = encodeURI("http://charts.camelcamelcamel.com/us/" + ASIN + "/sales-rank.png?force=1&zero=0&w=500&h=250&legend=1&ilt=1&tp=all&fo=0&lang=en");
 
-			// Decide which link to add:
-			var res;
-			if ((m = window.location.href.match(new RegExp("\\&showcamellargegraph=1\\b"))) != null) {
-				// Different sections of Amazon have different html, and so I need to
-				// try to add the Historical Data to multiple locations (once one works, quit)
-				
-				// Note, the ordering is important in below, search in that priority
-				// Page example: Electric shavers (which was once http://www.amazon.com/gp/product/B003YJAZZ4 )
-				//    This should NOT use title_feature_div, since it has a css max-height:55px. Instead, put it at the same level but just AFTER
-				
-				/*	var domNodeOptionsForLargeSalesRankGraph = [];
-				 *	domNodeOptionsForLargeSalesRankGraph.push(
-				 *		{"afterSiblingNotAsChild":true,  "parentId":'title_feature_div',         "getBy":"id"},
-				 *		{"afterSiblingNotAsChild":false, "parentId":'title_feature_div',         "getBy":"id"},
-				 *		{"afterSiblingNotAsChild":false, "parentId":'product-title_feature_div', "getBy":"id"},
-				 *		{"afterSiblingNotAsChild":false, "parentId":'title_row',                 "getBy":"id"},
-				 *		{"afterSiblingNotAsChild":false, "parentId":'title',                     "getBy":"id"},
-				 *		{"afterSiblingNotAsChild":false, "parentId":'parseasinTitle',            "getBy":"class"}
-				 *		);
-				 *	// Camel Historic Sales Rank graphs -- Do not enable until we add settings page
-				 *	for (var i = 0; i < domNodeOptionsForLargeSalesRankGraph.length; i++){
-				 *		domNodeOptionsForLargeSalesRankGraph[i].addListener = false;
-				 *		domNodeOptionsForLargeSalesRankGraph[i].addTitle    = true;
-				 *		console.info("Camel Historic Sales Rank graphs - trying " + domNodeOptionsForLargeSalesRankGraph[i].parentId);
-				 *		// Wait for settings page before adding sales rank
-				 *		res = addLinkImg(strCamelSalesRankLink, imgLargeSalesRankLoc, "Historical Sales Rank",
-				 *				'MyCamelSalesRankChart', 500, 250, domNodeOptionsForLargeSalesRankGraph[i]);
-				 *		if (res) break;
-				 *	}
-				 * */
-				
-				var domNodeOptionsForLargeCamelGraph = [];
-				domNodeOptionsForLargeCamelGraph.push(
-					{"afterSiblingNotAsChild":true,  "parentId":'title_feature_div',         "getBy":"id"},
-					{"afterSiblingNotAsChild":false, "parentId":'title_feature_div',         "getBy":"id"},
-					{"afterSiblingNotAsChild":false, "parentId":'product-title_feature_div', "getBy":"id"},
-					{"afterSiblingNotAsChild":false, "parentId":'title_row',                 "getBy":"id"},
-					{"afterSiblingNotAsChild":false, "parentId":'title',                     "getBy":"id"},
-					{"afterSiblingNotAsChild":false, "parentId":'parseasinTitle',            "getBy":"class"}
-					);
-				
-				// Camel Historic price graph
-				for (var i = 0; i < domNodeOptionsForLargeCamelGraph.length; i++){
-					domNodeOptionsForLargeCamelGraph[i].addListener = false;
-					domNodeOptionsForLargeCamelGraph[i].addTitle    = false;
-					console.info("Camel Large Historic price graph - trying " + domNodeOptionsForLargeCamelGraph[i].parentId);
-					res = addLinkImg(strCamelLink, imgLargeLoc, "HistoricPriceShopper - Click to go to CamelCamelCamel",
-							'MyCamelChart', 500, 400, domNodeOptionsForLargeCamelGraph[i]);
-					if (res) break;
-				}
-			}
-
+			/*	var domNodeOptionsForLargeSalesRankGraph = [];
+			 *	domNodeOptionsForLargeSalesRankGraph.push(
+			 *		{"afterSiblingNotAsChild":true,  "parentId":'title_feature_div',         "getBy":"id"},
+			 *		{"afterSiblingNotAsChild":false, "parentId":'title_feature_div',         "getBy":"id"},
+			 *		{"afterSiblingNotAsChild":false, "parentId":'product-title_feature_div', "getBy":"id"},
+			 *		{"afterSiblingNotAsChild":false, "parentId":'title_row',                 "getBy":"id"},
+			 *		{"afterSiblingNotAsChild":false, "parentId":'title',                     "getBy":"id"},
+			 *		{"afterSiblingNotAsChild":false, "parentId":'parseasinTitle',            "getBy":"class"}
+			 *		);
+			 * */
+			var domNodeOptionsForLargeCamelGraph = [];
+			domNodeOptionsForLargeCamelGraph.push(
+				{"afterSiblingNotAsChild":true,  "parentId":'title_feature_div',         "getBy":"id"},
+				{"afterSiblingNotAsChild":false, "parentId":'title_feature_div',         "getBy":"id"},
+				{"afterSiblingNotAsChild":false, "parentId":'product-title_feature_div', "getBy":"id"},
+				{"afterSiblingNotAsChild":false, "parentId":'title_row',                 "getBy":"id"},
+				{"afterSiblingNotAsChild":false, "parentId":'title',                     "getBy":"id"},
+				{"afterSiblingNotAsChild":false, "parentId":'parseasinTitle',            "getBy":"class"}
+				);
 			var domNodeOptionsForCamelLink = [];
 			domNodeOptionsForCamelLink.push(
 				{"parentId":'buybox',              "getBy":"id"},
@@ -387,16 +354,6 @@ http://stackoverflow.com/a/5947280/277601
 				{"parentId":'buybox_feature_div',  "getBy":"id"},
 				{"parentId":'buybox',              "getBy":"data-feature-name"}
 				);
-			finished = false;
-			// Camel goto-link
-			// Different sections of Amazon have different html, and so I need to
-			// try to add the Historical Data to multiple locations (once one works, quit)
-			for (var i = 0; i < domNodeOptionsForCamelLink.length; i++){
-				console.info("Camel link - trying " + domNodeOptionsForCamelLink[i].parentId);
-				res = addLink(strCamelLink, "Track at CamelCamelCamel", domNodeOptionsForCamelLink[i]);
-				if (res) break;
-			}
-			
 			var domNodeOptionsForMiniCamelGraph = [];
 			domNodeOptionsForMiniCamelGraph.push(
 				// Page example: Electric shavers (or deal of the day) (which was once http://www.amazon.com/gp/product/B003YJAZZ4 )
@@ -412,12 +369,57 @@ http://stackoverflow.com/a/5947280/277601
 				{"parentId":'buybox_feature_div',  "getBy":"id"},
 				{"parentId":'buybox',              "getBy":"data-feature-name"}
 				);
+			
+			// Decide which link to add:
+			var res;
+			if ((m = window.location.href.match(new RegExp("\\&showcamellargegraph=1\\b"))) != null) {
+				// Different sections of Amazon have different html, and so I need to
+				// try to add the Historical Data to multiple locations (once one works, quit)
+				
+				// Note, the ordering is important in below, search in that priority
+				// Page example: Electric shavers (which was once http://www.amazon.com/gp/product/B003YJAZZ4 )
+				//    This should NOT use title_feature_div, since it has a css max-height:55px. Instead, put it at the same level but just AFTER
+				
+				/*	// Camel Historic Sales Rank graphs -- Do not enable until we add settings page
+				 *	for (var i = 0; i < domNodeOptionsForLargeSalesRankGraph.length; i++){
+				 *		domNodeOptionsForLargeSalesRankGraph[i].addListener = false;
+				 *		domNodeOptionsForLargeSalesRankGraph[i].addTitle    = true;
+				 *		// console.info("Camel Historic Sales Rank graphs - trying " + domNodeOptionsForLargeSalesRankGraph[i].parentId);
+				 *		// Wait for settings page before adding sales rank
+				 *		res = addLinkImg(strCamelSalesRankLink, imgLargeSalesRankLoc, "Historical Sales Rank",
+				 *				'MyCamelSalesRankChart', 500, 250, domNodeOptionsForLargeSalesRankGraph[i]);
+				 *		if (res) break;
+				 *	}
+				 * */
+				
+				
+				// Camel Historic price graph
+				for (var i = 0; i < domNodeOptionsForLargeCamelGraph.length; i++){
+					domNodeOptionsForLargeCamelGraph[i].addListener = false;
+					domNodeOptionsForLargeCamelGraph[i].addTitle    = false;
+					// console.info("Camel Large Historic price graph - trying " + domNodeOptionsForLargeCamelGraph[i].parentId);
+					res = addLinkImg(strCamelLink, imgLargeLoc, "HistoricPriceShopper - Click to go to CamelCamelCamel",
+							'MyCamelChart', 500, 400, domNodeOptionsForLargeCamelGraph[i]);
+					if (res) break;
+				}
+			}
+
+			finished = false;
+			// Camel goto-link
+			// Different sections of Amazon have different html, and so I need to
+			// try to add the Historical Data to multiple locations (once one works, quit)
+			for (var i = 0; i < domNodeOptionsForCamelLink.length; i++){
+				// console.info("Camel link - trying " + domNodeOptionsForCamelLink[i].parentId);
+				res = addLink(strCamelLink, "Track at CamelCamelCamel", domNodeOptionsForCamelLink[i]);
+				if (res) break;
+			}
+			
 			// Camel Historic price mini-graph
 			for (var i = 0; i < domNodeOptionsForMiniCamelGraph.length; i++){
 				domNodeOptionsForMiniCamelGraph[i].addListener            = true;
 				domNodeOptionsForMiniCamelGraph[i].addTitle               = false;
 				domNodeOptionsForMiniCamelGraph[i].afterSiblingNotAsChild = false;
-				console.info("Camel Historic price mini-graph - trying " + domNodeOptionsForMiniCamelGraph[i].parentId);
+				// console.info("Camel Historic price mini-graph - trying " + domNodeOptionsForMiniCamelGraph[i].parentId);
 				res = addLinkImg(strNewALink, imgSmallLoc, "Click to see larger image - HistoricPriceShopper",
 						'MyMiniCamelChart', 175, 100, domNodeOptionsForMiniCamelGraph[i]);
 				if (res) break;
