@@ -1,36 +1,26 @@
 // ==UserScript==
 // @name           Historic Price Shopper
-// @namespace      AHC.newwarestech.com
-// @description    Adds Amazon.com historical price graph above the AddToCart button so you can always know if it's a good time to buy.
-// @icon           http://www.amazon.com/favicon.ico
-// @include        http://www.amazon.*/*
-// @include        http://amazon.*/*
-// @version        0.16
 // ==/UserScript==
-
-//http://www.amazon.com/.*amazon.com.*?\/([A-Z0-9]{10})\/.*/i
-//var links = document.getElementsByTagName("a"); //array
-
-// TODO: Load images from side: http://stackoverflow.com/a/20711569/277601
 
 http://stackoverflow.com/a/5947280/277601
 (function(amznhc, $, undefined) {
 
 	// http://stackoverflow.com/a/24649134/277601
 	// Avoid recursive frame insertion...
-	var extensionOrigin = 'chrome-extension://' + chrome.runtime.id;
-	if (!location.ancestorOrigins.contains(extensionOrigin)) {
-		pingForFakespotData();
-	}
+	// var extensionOrigin = 'chrome-extension://' + chrome.runtime.id;
+	// if (!location.ancestorOrigins.contains(extensionOrigin)) {
+	// 	pingForFakespotData();
+	// }
 
-	// Get latest details from Fakespot
-	//   Status will be:
-	//     NONE - Ping again in 3 seconds
-	//     BAD - Do not continue
-	//     WAITING_FOR_PAGE_GENERATION - Ping again in 3 seconds
-	//     ANALYZING - Ping again in 3 seconds
-	//     NOT_ENOUGH_REVIEWS - Do not continue
-	//     DONE - Do not continue, should have product/company grade and Trustwerty rating
+	/** Get latest details from Fakespot
+	 *   Status will be:
+	 *     NONE - Ping again in 3 seconds
+	 *     BAD - Do not continue
+	 *     WAITING_FOR_PAGE_GENERATION - Ping again in 3 seconds
+	 *     ANALYZING - Ping again in 3 seconds
+	 *     NOT_ENOUGH_REVIEWS - Do not continue
+	 *     DONE - Do not continue, should have product/company grade and Trustwerty rating
+	 * */
 	function pingForFakespotData(){
 		chrome.runtime.sendMessage({
 			method: 'GET',
@@ -183,16 +173,16 @@ http://stackoverflow.com/a/5947280/277601
 	/**
 	 * Adds a link to page, as a child of a parent (with a specific Id, ClassName, or TagName)
 	 * */
-	function addLink(url, text, parentID, getBy) {
+	function addLink(url, text, domNodeOptions) {
 	  var element;
-	  if (getBy == "id") {
-		element = document.getElementById(parentID);
-	  } else if (getBy == "class") {
-		var elements = document.getElementsByClassName(parentID);
+	  if (domNodeOptions.getBy == "id") {
+		element = document.getElementById(domNodeOptions.parentId);
+	  } else if (domNodeOptions.getBy == "class") {
+		var elements = document.getElementsByClassName(domNodeOptions.parentId);
 		if (elements.length == 0) return false;
 		element = elements[0];
-	  } else if (getBy == "tag") {
-		var elements = document.getElementsByTagName(parentID);
+	  } else if (domNodeOptions.getBy == "tag") {
+		var elements = document.getElementsByTagName(domNodeOptions.parentId);
 		if (elements.length == 0) return false;
 		element = elements[0];
 	  }
@@ -207,7 +197,7 @@ http://stackoverflow.com/a/5947280/277601
 	  label.setAttribute('href', url);
 	  label.setAttribute('rel', 'noreferrer');
 	  label.appendChild(span);
-	  //console.log("found " + parentID);
+	  //console.log("found " + parentId);
 	  element.insertBefore(label, element.firstChild);
 	  //element.insertBefore(document.createElement('br'), element.firstChild);
 	  return true;
@@ -220,22 +210,22 @@ http://stackoverflow.com/a/5947280/277601
 	 * our modifications get removed, so we wait for a delay following the removal, and add them
 	 * back in.
 	 * */
-	function addLinkImg(url, imgUrl, imgTitle, divName, addListener, addTitle, afterSiblingNotAsChild, parentID, getBy, width, height) {
+	function addLinkImg(url, imgUrl, imgTitle, divName, width, height, domNodeOptions) {
 	  var element;
 	  var siblingToPlaceBefore;
-	  if (getBy == "id") {
-		element = document.getElementById(parentID);
-	  } else if (getBy == "class") {
-		var elements = document.getElementsByClassName(parentID);
+	  if (domNodeOptions.getBy == "id") {
+		element = document.getElementById(domNodeOptions.parentId);
+	  } else if (domNodeOptions.getBy == "class") {
+		var elements = document.getElementsByClassName(domNodeOptions.parentId);
 		if (elements.length == 0) return false;
 		element = elements[0];
-	  } else if (getBy == "tag") {
-		var elements = document.getElementsByTagName(parentID);
+	  } else if (domNodeOptions.getBy == "tag") {
+		var elements = document.getElementsByTagName(domNodeOptions.parentId);
 		if (elements.length == 0) return false;
 		element = elements[0];
 	  }
 	  if (element == null) return false;
-	  if (afterSiblingNotAsChild) {
+	  if (domNodeOptions.afterSiblingNotAsChild) {
 		  siblingToPlaceBefore = element.nextSibling;
 		  if (element != null) 
 			  element = element.parentNode;
@@ -259,7 +249,7 @@ http://stackoverflow.com/a/5947280/277601
 	  img.setAttribute('width', width);
 	  img.setAttribute('height', height);
 
-	  if (addTitle) {
+	  if (domNodeOptions.addTitle) {
 		  var span = document.createElement('span');
 		  span.setAttribute('style', 'font-size : large; color : #9933ff;');
 		  span.innerHTML = imgTitle;
@@ -271,19 +261,21 @@ http://stackoverflow.com/a/5947280/277601
 	  div.appendChild(document.createElement('br'));
 	  div.appendChild(document.createElement('br'));
 	  label.appendChild(img);
-	  //console.log("found " + parentID);
-	  if (afterSiblingNotAsChild)
+	  //console.log("found " + domNodeOptions.parentId);
+	  if (domNodeOptions.afterSiblingNotAsChild)
 		  element.insertBefore(div, siblingToPlaceBefore);
 	  else
 		  element.insertBefore(div, siblingToPlaceBefore);
 	  
-	  if (addListener) div.addEventListener('DOMNodeRemovedFromDocument', onCamelRemove, false);
+	  if (domNodeOptions.addListener) div.addEventListener('DOMNodeRemovedFromDocument', onCamelRemove, false);
 
 	  return true;
 	}
 
 	/**
 	 * Gets the product ASIN (i.e. B01MRZIY0P)
+	 * It tries to find it by first searching for Id named ASIN or asin,
+	 * and then it tries the current page's URL: http://.*amazon.com.*?\/([A-Z0-9]{10})\/
 	 * */
 	function getASIN() {
 		var ASIN = "";
@@ -331,49 +323,108 @@ http://stackoverflow.com/a/5947280/277601
 			var imgLargeSalesRankLoc = encodeURI("http://charts.camelcamelcamel.com/us/" + ASIN + "/sales-rank.png?force=1&zero=0&w=500&h=250&legend=1&ilt=1&tp=all&fo=0&lang=en");
 
 			// Decide which link to add:
-			var finished = false; // There are multiple tags to try for different pages on Amazon
+			var res;
 			if ((m = window.location.href.match(new RegExp("\\&showcamellargegraph=1\\b"))) != null) {
 				// Different sections of Amazon have different html, and so I need to
 				// try to add the Historical Data to multiple locations (once one works, quit)
 				
-				
-				// Wait for settings page before adding sales rank
-				//if (!finished) finished = addLinkImg(strCamelSalesRankLink, imgLargeSalesRankLoc, "Historical Sales Rank", 'MyCamelSalesRankChart', false, true, false, 'title_feature_div', "id", 500, 250);
-				//if (!finished) finished = addLinkImg(strCamelSalesRankLink, imgLargeSalesRankLoc, "Historical Sales Rank", 'MyCamelSalesRankChart', false, true, false, 'product-title_feature_div', "id", 500, 250);
-				//if (!finished) finished = addLinkImg(strCamelSalesRankLink, imgLargeSalesRankLoc, "Historical Sales Rank", 'MyCamelSalesRankChart', false, true, false, 'title_row', "id", 500, 250);
-				//if (!finished) finished = addLinkImg(strCamelSalesRankLink, imgLargeSalesRankLoc, "Historical Sales Rank", 'MyCamelSalesRankChart', false, true, false, 'title', "id", 500, 250);
-				//if (!finished) finished = addLinkImg(strCamelSalesRankLink, imgLargeSalesRankLoc, "Historical Sales Rank", 'MyCamelSalesRankChart', false, true, false, 'parseasinTitle', "class", 500, 250);
-				finished = false;
+				// Note, the ordering is important in below, search in that priority
 				// Page example: Electric shavers (which was once http://www.amazon.com/gp/product/B003YJAZZ4 )
-				//   This should NOT use title_feature_div, since it has a css max-height:55px. Instead, put it at the same level but just AFTER
-				if (!finished) finished = addLinkImg(strCamelLink, imgLargeLoc, "HistoricPriceShopper - Click to go to CamelCamelCamel", 'MyCamelChart', false, false, true,  'title_feature_div', "id",    500, 400);
-				if (!finished) finished = addLinkImg(strCamelLink, imgLargeLoc, "HistoricPriceShopper - Click to go to CamelCamelCamel", 'MyCamelChart', false, false, false, 'title_feature_div', "id",    500, 400);
-				if (!finished) finished = addLinkImg(strCamelLink, imgLargeLoc, "HistoricPriceShopper - Click to go to CamelCamelCamel", 'MyCamelChart', false, false, false, 'product-title_feature_div', "id", 500, 400);
-				if (!finished) finished = addLinkImg(strCamelLink, imgLargeLoc, "HistoricPriceShopper - Click to go to CamelCamelCamel", 'MyCamelChart', false, false, false, 'title_row',         "id",    500, 400);
-				if (!finished) finished = addLinkImg(strCamelLink, imgLargeLoc, "HistoricPriceShopper - Click to go to CamelCamelCamel", 'MyCamelChart', false, false, false, 'title',             "id",    500, 400);
-				if (!finished) finished = addLinkImg(strCamelLink, imgLargeLoc, "HistoricPriceShopper - Click to go to CamelCamelCamel", 'MyCamelChart', false, false, false, 'parseasinTitle',    "class", 500, 400);
+				//    This should NOT use title_feature_div, since it has a css max-height:55px. Instead, put it at the same level but just AFTER
+				
+				/*	var domNodeOptionsForLargeSalesRankGraph = [];
+				 *	domNodeOptionsForLargeSalesRankGraph.push(
+				 *		{"afterSiblingNotAsChild":true,  "parentId":'title_feature_div',         "getBy":"id"},
+				 *		{"afterSiblingNotAsChild":false, "parentId":'title_feature_div',         "getBy":"id"},
+				 *		{"afterSiblingNotAsChild":false, "parentId":'product-title_feature_div', "getBy":"id"},
+				 *		{"afterSiblingNotAsChild":false, "parentId":'title_row',                 "getBy":"id"},
+				 *		{"afterSiblingNotAsChild":false, "parentId":'title',                     "getBy":"id"},
+				 *		{"afterSiblingNotAsChild":false, "parentId":'parseasinTitle',            "getBy":"class"}
+				 *		);
+				 *	// Camel Historic Sales Rank graphs -- Do not enable until we add settings page
+				 *	for (var i = 0; i < domNodeOptionsForLargeSalesRankGraph.length; i++){
+				 *		domNodeOptionsForLargeSalesRankGraph[i].addListener = false;
+				 *		domNodeOptionsForLargeSalesRankGraph[i].addTitle    = true;
+				 *		console.info("Camel Historic Sales Rank graphs - trying " + domNodeOptionsForLargeSalesRankGraph[i].parentId);
+				 *		// Wait for settings page before adding sales rank
+				 *		res = addLinkImg(strCamelSalesRankLink, imgLargeSalesRankLoc, "Historical Sales Rank",
+				 *				'MyCamelSalesRankChart', 500, 250, domNodeOptionsForLargeSalesRankGraph[i]);
+				 *		if (res) break;
+				 *	}
+				 * */
+				
+				var domNodeOptionsForLargeCamelGraph = [];
+				domNodeOptionsForLargeCamelGraph.push(
+					{"afterSiblingNotAsChild":true,  "parentId":'title_feature_div',         "getBy":"id"},
+					{"afterSiblingNotAsChild":false, "parentId":'title_feature_div',         "getBy":"id"},
+					{"afterSiblingNotAsChild":false, "parentId":'product-title_feature_div', "getBy":"id"},
+					{"afterSiblingNotAsChild":false, "parentId":'title_row',                 "getBy":"id"},
+					{"afterSiblingNotAsChild":false, "parentId":'title',                     "getBy":"id"},
+					{"afterSiblingNotAsChild":false, "parentId":'parseasinTitle',            "getBy":"class"}
+					);
+				
+				// Camel Historic price graph
+				for (var i = 0; i < domNodeOptionsForLargeCamelGraph.length; i++){
+					domNodeOptionsForLargeCamelGraph[i].addListener = false;
+					domNodeOptionsForLargeCamelGraph[i].addTitle    = false;
+					console.info("Camel Large Historic price graph - trying " + domNodeOptionsForLargeCamelGraph[i].parentId);
+					res = addLinkImg(strCamelLink, imgLargeLoc, "HistoricPriceShopper - Click to go to CamelCamelCamel",
+							'MyCamelChart', 500, 400, domNodeOptionsForLargeCamelGraph[i]);
+					if (res) break;
+				}
 			}
+
+			var domNodeOptionsForCamelLink = [];
+			domNodeOptionsForCamelLink.push(
+				{"parentId":'buybox',              "getBy":"id"},
+				{"parentId":'buy-box_feature_div', "getBy":"id"},
+				{"parentId":'dmusic_buy_box',      "getBy":"id"},
+				{"parentId":'buy',                 "getBy":"class"},
+				{"parentId":'buying',              "getBy":"class"},
+				// These should be a last-check since it puts it in wrong spot for other pages like http://www.amazon.com/gp/product/B00U3FPN4U
+				{"parentId":'price_feature_div',   "getBy":"id"},
+				// Page example: Baby K'tan Original Baby Carrier amazon.com/dp/B00FSKX266
+				{"parentId":'buybox_feature_div',  "getBy":"id"},
+				{"parentId":'buybox',              "getBy":"data-feature-name"}
+				);
 			finished = false;
+			// Camel goto-link
 			// Different sections of Amazon have different html, and so I need to
 			// try to add the Historical Data to multiple locations (once one works, quit)
-			if (!finished) finished = addLink(strCamelLink, "Track at CamelCamelCamel", 'buybox', "id");
-			if (!finished) finished = addLink(strCamelLink, "Track at CamelCamelCamel", 'buy-box_feature_div', "id");
-			if (!finished) finished = addLink(strCamelLink, "Track at CamelCamelCamel", 'dmusic_buy_box', "id");
-			if (!finished) finished = addLink(strCamelLink, "Track at CamelCamelCamel", 'buy', "class");
-			if (!finished) finished = addLink(strCamelLink, "Track at CamelCamelCamel", 'buying', "class");
-			finished = false;
-			if (!finished) finished = addLinkImg(strNewALink, imgSmallLoc, "Click to see larger image - HistoricPriceShopper", 'MyMiniCamelChart', true, false, false, 'buybox',              "id",    175, 100);
-			if (!finished) finished = addLinkImg(strNewALink, imgSmallLoc, "Click to see larger image - HistoricPriceShopper", 'MyMiniCamelChart', true, false, false, 'buy-box_feature_div', "id",    175, 100);
-			if (!finished) finished = addLinkImg(strNewALink, imgSmallLoc, "Click to see larger image - HistoricPriceShopper", 'MyMiniCamelChart', true, false, false, 'dmusic_buy_box',      "id",    175, 100);
-			if (!finished) finished = addLinkImg(strNewALink, imgSmallLoc, "Click to see larger image - HistoricPriceShopper", 'MyMiniCamelChart', true, false, false, 'buy',                 "class", 175, 100);
-			if (!finished) finished = addLinkImg(strNewALink, imgSmallLoc, "Click to see larger image - HistoricPriceShopper", 'MyMiniCamelChart', true, false, false, 'buying',              "class", 175, 100);
-			// Page example: Electric shavers (or deal of the day) (which was once http://www.amazon.com/gp/product/B003YJAZZ4 )
-			//   This should NOT use buy-box_feature_div, since it doesn't seem to be created at the time the DOM is built :-/
-			//   This should be a last-check since it puts it in wrong spot for other pages like http://www.amazon.com/gp/product/B00U3FPN4U
-			if (!finished) finished = addLinkImg(strNewALink, imgSmallLoc, "Click to see larger image - HistoricPriceShopper", 'MyMiniCamelChart', true, false, false, 'price_feature_div',   "id",    175, 100);
-			// Page example: Baby K'tan Original Baby Carrier amazon.com/dp/B00FSKX266
-			if (!finished) finished = addLinkImg(strNewALink, imgSmallLoc, "Click to see larger image - HistoricPriceShopper", 'MyMiniCamelChart', true, false, false, 'buybox_feature_div',   "id",    175, 100);
-			if (!finished) finished = addLinkImg(strNewALink, imgSmallLoc, "Click to see larger image - HistoricPriceShopper", 'MyMiniCamelChart', true, false, false, 'buybox',   "data-feature-name",    175, 100);
+			for (var i = 0; i < domNodeOptionsForCamelLink.length; i++){
+				console.info("Camel link - trying " + domNodeOptionsForCamelLink[i].parentId);
+				res = addLink(strCamelLink, "Track at CamelCamelCamel", domNodeOptionsForCamelLink[i]);
+				if (res) break;
+			}
+			
+			var domNodeOptionsForMiniCamelGraph = [];
+			domNodeOptionsForMiniCamelGraph.push(
+				// Page example: Electric shavers (or deal of the day) (which was once http://www.amazon.com/gp/product/B003YJAZZ4 )
+				//   This should NOT use buy-box_feature_div, since it doesn't seem to be created at the time the DOM is built :-/
+				{"parentId":'buybox',              "getBy":"id"},
+				{"parentId":'buy-box_feature_div', "getBy":"id"},
+				{"parentId":'dmusic_buy_box',      "getBy":"id"},
+				{"parentId":'buy',                 "getBy":"class"},
+				{"parentId":'buying',              "getBy":"class"},
+				//   These should be a last-check since it puts it in wrong spot for other pages like http://www.amazon.com/gp/product/B00U3FPN4U
+				{"parentId":'price_feature_div',   "getBy":"id"},
+				// Page example: Baby K'tan Original Baby Carrier amazon.com/dp/B00FSKX266
+				{"parentId":'buybox_feature_div',  "getBy":"id"},
+				{"parentId":'buybox',              "getBy":"data-feature-name"}
+				);
+			// Camel Historic price mini-graph
+			for (var i = 0; i < domNodeOptionsForMiniCamelGraph.length; i++){
+				domNodeOptionsForMiniCamelGraph[i].addListener            = true;
+				domNodeOptionsForMiniCamelGraph[i].addTitle               = false;
+				domNodeOptionsForMiniCamelGraph[i].afterSiblingNotAsChild = false;
+				console.info("Camel Historic price mini-graph - trying " + domNodeOptionsForMiniCamelGraph[i].parentId);
+				res = addLinkImg(strNewALink, imgSmallLoc, "Click to see larger image - HistoricPriceShopper",
+						'MyMiniCamelChart', 175, 100, domNodeOptionsForMiniCamelGraph[i]);
+				if (res) break;
+			}
+			
+			// Add Fakespot results
+			pingForFakespotData();
 		} else {
 			//console.log("Didn't find Amazon stuff");
 		}
