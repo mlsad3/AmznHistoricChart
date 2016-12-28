@@ -302,7 +302,7 @@ http://stackoverflow.com/a/5947280/277601
 	  table.appendChild(tbody);
 	  
 	  //// Fakespot(tm) Grade
-	  var tr, td, div, txt, span, color, hoverText;
+	  var tr, td, div, txt, span, color, hoverText, icon;
 	  tr = document.createElement('tr');
 	  tbody.appendChild(tr);
 	  tr.setAttribute('style', 'padding:0px;margin-bottom:0px;');
@@ -364,9 +364,9 @@ http://stackoverflow.com/a/5947280/277601
 	  td.setAttribute('title', hoverText);
 	  if (results.productUrl != null){
 		  td.setAttribute('onclick', "window.open('" + results.productUrl + "')");
-		  td.setAttribute('style', 'cursor: pointer;width:30%;');
+		  td.setAttribute('style', 'cursor: pointer;width:25%;');
 	  } else {
-		  td.setAttribute('style', 'width:30%;');
+		  td.setAttribute('style', 'width:25%;');
 	  }
 	  div = document.createElement('div');
 	  td.appendChild(div);
@@ -405,9 +405,9 @@ http://stackoverflow.com/a/5947280/277601
 	  td.setAttribute('title', hoverText);
 	  if (results.companyGradeUrl != null){
 		  td.setAttribute('onclick', "window.open('" + results.companyGradeUrl + "')");
-		  td.setAttribute('style', 'cursor: pointer;width:30%;');
+		  td.setAttribute('style', 'cursor: pointer;width:25%;');
 	  } else {
-		  td.setAttribute('style', 'width:30%;');
+		  td.setAttribute('style', 'width:25%;');
 	  }
 	  div = document.createElement('div');
 	  td.appendChild(div);
@@ -440,27 +440,31 @@ http://stackoverflow.com/a/5947280/277601
 		  } else {
 			  hoverText = "Product: " + results.productName + "\r\n\r\n" +
 						  "\tAfter removing the suspicious reviews, Trustwerty\r\n" +
-						  "\trecalculated the reviews to be " + results.twStars + " stars.\r\n\r\n" +
+						  "\trecalculated the reviews to be " + results.twStars + " out of 5 stars.\r\n\r\n" +
 						  "Visit Trustwerty.com for a detailed report of the comments!";
 		  }
 		  td.setAttribute('title', hoverText);
 		  if (results.twStarsUrl != null){
 			  td.setAttribute('onclick', "window.open('" + results.twStarsUrl + "')");
-			  td.setAttribute('style', 'cursor: pointer;width:40%;');
+			  td.setAttribute('style', 'cursor: pointer;width:50%;');
 		  } else {
-			  td.setAttribute('style', 'width:30%;');
+			  td.setAttribute('style', 'width:50%;');
 		  }
 		  div = document.createElement('div');
 		  td.appendChild(div);
 		  color = getFakespotGradeColor(results.companyGrade);
 		  div.setAttribute('style', 'border:1px solid rgba(0,0,0,0);border-radius: 5px;font-size:20px;line-height:25px;font-weight:700;text-decoration:none;');
-		  txt = document.createTextNode(results.twStars);
-		  div.appendChild(txt);
+		  icon = document.createElement('i');
+		  div.appendChild(icon);
+		  // To round to .5, multiply the number by 2 before rounding
+		  var numStars = Math.round(results.twStars * 2)/2;
+		  var numStarsStr = Math.trunc(numStars) + (Math.trunc(numStars)==numStars ? "" : "-5");
+		  icon.className = "a-icon a-icon-star a-star-"+numStarsStr;
 		  span = document.createElement("span");
-		  div.appendChild(span);
-		  txt = document.createTextNode(" Stars");
+		  icon.appendChild(span);
+		  span.className = "a-icon-alt";
+		  txt = document.createTextNode(results.twStars + " out of 5 stars");
 		  span.appendChild(txt);
-		  span.setAttribute('style', 'font-size:13px;');
 		  div = document.createElement('div');
 		  td.appendChild(div);
 		  div.setAttribute('style', 'font-weight:400;font-size:10px;line-height:12px;color:#1560a1;text-decoration:none;');
