@@ -199,7 +199,7 @@ http://stackoverflow.com/a/5947280/277601
 
 	  var div = document.createElement('div');
 	  div.setAttribute('id', details.nodeName);
-	  div.setAttribute('style', 'border-radius: 5px;padding: 6px;box-shadow: rgba(0, 120, 0, 0.2) 1px 2px 2px 0px; margin-bottom: 4px;');
+	  div.setAttribute('style', 'border-radius: 5px;padding: 6px;box-shadow: rgba(0, 120, 0, 0.2) 1px 2px 2px 0px; margin-bottom: 4px;max-width:200px');
 	  
 	  var label = document.createElement('a');
 	  label.setAttribute('class', 'nav_a');
@@ -279,7 +279,7 @@ http://stackoverflow.com/a/5947280/277601
 
 	  var fsDiv = document.createElement('div');
 	  fsDiv.setAttribute('id', "MyFakespotReport");
-	  fsDiv.setAttribute('style', 'text-decoration: none; color: rgb(94, 170, 241); font-weight: 500; text-align: center; border-radius: 5px; box-shadow: rgba(0, 120, 0, 0.2) 1px 2px 2px 0px; background-color: rgb(255, 255, 255); position: relative; margin-bottom: 4px;padding:4px');
+	  fsDiv.setAttribute('style', 'text-decoration: none; color: rgb(94, 170, 241); font-weight: 500; text-align: center; border-radius: 5px; box-shadow: rgba(0, 120, 0, 0.2) 1px 2px 2px 0px; background-color: rgb(255, 255, 255); position: relative; margin-bottom: 4px;padding:4px;max-width:200px');
 	  domLoc.element.insertBefore(fsDiv, domLoc.siblingToPlaceBefore);
 	  UpdateFakespotDetails(results);
 	  return true;
