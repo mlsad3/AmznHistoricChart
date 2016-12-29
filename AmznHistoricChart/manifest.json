@@ -28,7 +28,7 @@
 	    "https://www.amazon.co.uk/*",
 		"https://amazon.co.uk/*"
 		],
-      "js": ["jquery-2.1.4.min.js", "lru.js", "amazonfs.js", "amazon.user.js"]
+      "js": ["jquery-2.1.4.min.js", "lru.js", "amazonfs.js", "progressbar.js", "amazon.user.js"]
     }
   ],
   "permissions": [
