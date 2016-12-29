@@ -199,7 +199,7 @@ http://stackoverflow.com/a/5947280/277601
 
 	  var div = document.createElement('div');
 	  div.setAttribute('id', details.nodeName);
-	  div.setAttribute('style', 'border-radius: 5px;padding: 6px;box-shadow: rgba(0, 120, 0, 0.2) 1px 2px 2px 0px; margin-bottom: 4px;max-width:200px');
+	  div.setAttribute('style', 'border-radius: 5px;padding: 6px;box-shadow: rgba(0, 120, 0, 0.2) 1px 2px 2px 0px; margin-bottom: 4px;max-width:270px');
 	  
 	  var label = document.createElement('a');
 	  label.setAttribute('class', 'nav_a');
@@ -279,7 +279,7 @@ http://stackoverflow.com/a/5947280/277601
 
 	  var fsDiv = document.createElement('div');
 	  fsDiv.setAttribute('id', "MyFakespotReport");
-	  fsDiv.setAttribute('style', 'text-decoration: none; color: rgb(94, 170, 241); font-weight: 500; text-align: center; border-radius: 5px; box-shadow: rgba(0, 120, 0, 0.2) 1px 2px 2px 0px; background-color: rgb(255, 255, 255); position: relative; margin-bottom: 4px;padding:4px;max-width:200px');
+	  fsDiv.setAttribute('style', 'text-decoration: none; color: rgb(94, 170, 241); font-weight: 500; text-align: center; border-radius: 5px; box-shadow: rgba(0, 120, 0, 0.2) 1px 2px 2px 0px; background-color: rgb(255, 255, 255); position: relative; margin-bottom: 4px;padding:4px;max-width:270px');
 	  domLoc.element.insertBefore(fsDiv, domLoc.siblingToPlaceBefore);
 	  UpdateFakespotDetails(results);
 	  return true;
@@ -381,45 +381,47 @@ http://stackoverflow.com/a/5947280/277601
 	  div.appendChild(txt);
 	  
 	  //// Company Grade
-	  td = document.createElement('td');
-	  tr.appendChild(td);
-	  if (results.status == amazonfs.StatusEnum.WAITING_FOR_PAGE_GENERATION){
-		  hoverText = "This is a company Fakespot has not analyzed yet.\r\n" +
-		              "Please wait while analysis happens or click to\r\n" +
-					  "visit Fakespot.com for a detailed report.";
-	  } else if (results.status == amazonfs.StatusEnum.ANALYZING){
-		  hoverText = "Fakespot is analyzing this product's comments\r\n" +
-		              "\tStatus: " + results.analysisPercent + "% complete.\r\n" +
-		              "\t" + results.analysisNotes + "\r\n\r\n" +
-					  "Visit Fakespot.com for a detailed report!";
-	  } else if (results.status == amazonfs.StatusEnum.NOT_ENOUGH_REVIEWS){
-		  hoverText = "This company's product does not have enough reviews\r\n" +
-		              "for Fakespot to analyze.";
-	  } else {
-		  hoverText = "Company: " + results.companyName + "\r\n\r\n" +
-		              "\tThis company got a '" + results.companyGrade.toUpperCase() + "' grade based on the\r\n" +
-		              "\ttrustability of all of its products' comments.\r\n" +
-		              "\ti.e. \"Is the company funding a lot of fake reviews?\"\r\n\r\n" +
-					  "Visit Fakespot.com for a detailed report on this company!";
-	  }
-	  td.setAttribute('title', hoverText);
 	  if (results.companyGradeUrl != null){
-		  td.setAttribute('onclick', "window.open('" + results.companyGradeUrl + "')");
-		  td.setAttribute('style', 'cursor: pointer;width:25%;');
-	  } else {
-		  td.setAttribute('style', 'width:25%;');
+		  td = document.createElement('td');
+		  tr.appendChild(td);
+		  if (results.status == amazonfs.StatusEnum.WAITING_FOR_PAGE_GENERATION){
+			  hoverText = "This is a company Fakespot has not analyzed yet.\r\n" +
+						  "Please wait while analysis happens or click to\r\n" +
+						  "visit Fakespot.com for a detailed report.";
+		  } else if (results.status == amazonfs.StatusEnum.ANALYZING){
+			  hoverText = "Fakespot is analyzing this product's comments\r\n" +
+						  "\tStatus: " + results.analysisPercent + "% complete.\r\n" +
+						  "\t" + results.analysisNotes + "\r\n\r\n" +
+						  "Visit Fakespot.com for a detailed report!";
+		  } else if (results.status == amazonfs.StatusEnum.NOT_ENOUGH_REVIEWS){
+			  hoverText = "This company's product does not have enough reviews\r\n" +
+						  "for Fakespot to analyze.";
+		  } else {
+			  hoverText = "Company: " + results.companyName + "\r\n\r\n" +
+						  "\tThis company got a '" + results.companyGrade.toUpperCase() + "' grade based on the\r\n" +
+						  "\ttrustability of all of its products' comments.\r\n" +
+						  "\ti.e. \"Is the company funding a lot of fake reviews?\"\r\n\r\n" +
+						  "Visit Fakespot.com for a detailed report on this company!";
+		  }
+		  td.setAttribute('title', hoverText);
+		  if (results.companyGradeUrl != null){
+			  td.setAttribute('onclick', "window.open('" + results.companyGradeUrl + "')");
+			  td.setAttribute('style', 'cursor: pointer;width:25%;');
+		  } else {
+			  td.setAttribute('style', 'width:25%;');
+		  }
+		  div = document.createElement('div');
+		  td.appendChild(div);
+		  color = getFakespotGradeColor(results.companyGrade);
+		  div.setAttribute('style', 'border:1px solid ' + color + ';border-radius: 5px;color:' + color + ';background-color:#FFFFFF;font-size:22px;line-height:25px;font-weight:700;text-decoration:none;');
+		  txt = document.createTextNode(results.companyGrade.toUpperCase());
+		  div.appendChild(txt);
+		  div = document.createElement('div');
+		  td.appendChild(div);
+		  div.setAttribute('style', 'font-weight:400;font-size:10px;line-height:12px;text-decoration:none;');
+		  txt = document.createTextNode("Company");
+		  div.appendChild(txt);
 	  }
-	  div = document.createElement('div');
-	  td.appendChild(div);
-	  color = getFakespotGradeColor(results.companyGrade);
-	  div.setAttribute('style', 'border:1px solid ' + color + ';border-radius: 5px;color:' + color + ';background-color:#FFFFFF;font-size:22px;line-height:25px;font-weight:700;text-decoration:none;');
-	  txt = document.createTextNode(results.companyGrade.toUpperCase());
-	  div.appendChild(txt);
-	  div = document.createElement('div');
-	  td.appendChild(div);
-	  div.setAttribute('style', 'font-weight:400;font-size:10px;line-height:12px;text-decoration:none;');
-	  txt = document.createTextNode("Company");
-	  div.appendChild(txt);
 	  
 	  //// Trustwerty - I'm not sure if every product has a score. It seems like I've seen some without.
 	  if (results.twStars >0){
