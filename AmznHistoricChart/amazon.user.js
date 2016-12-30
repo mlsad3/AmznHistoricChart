@@ -525,7 +525,7 @@ http://stackoverflow.com/a/5947280/277601
 	  if (results.status == amazonfs.StatusEnum.WAITING_FOR_PAGE_GENERATION){
 		  updateFakespotProgressBar(5);
 	  } else if (results.status == amazonfs.StatusEnum.ANALYZING){
-		  updateFakespotProgressBar(results.analysisPercent);
+		  updateFakespotProgressBar((10 + results.analysisPercent)/1.1);
 	  } else {
 		  if (results.status == amazonfs.StatusEnum.NOT_ENOUGH_REVIEWS ||
 			results.status == amazonfs.StatusEnum.DONE ||
