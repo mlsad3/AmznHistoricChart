@@ -12,6 +12,8 @@ http://stackoverflow.com/a/5947280/277601
 	// 	pingForFakespotData();
 	// }
 
+	var debug = false;
+	
 	/** Get latest details from Fakespot
 	 *   Status will be:
 	 *     NONE - Ping again in 3 seconds
@@ -27,33 +29,33 @@ http://stackoverflow.com/a/5947280/277601
 			action: 'fakespot_xhttp',
 			url: "https://" + window.location.hostname + window.location.pathname
 		}, function(result) {
-			console.log("Got fakespot data back: " + result.productGrade + " - " + result.companyGrade + " - " + result.twStars);
-			console.log("   Returned status: " + result.status);
+			if (debug) console.log("Got fakespot data back: " + result.productGrade + " - " + result.companyGrade + " - " + result.twStars);
+			if (debug) console.log("   Returned status: " + result.status);
 			
 			switch(result.status){
 				case amazonfs.StatusEnum.WAITING_FOR_PAGE_GENERATION:
-					console.log("Status:WAITING_FOR_PAGE_GENERATION");
+					if (debug) console.log("FSStatus:WAITING_FOR_PAGE_GENERATION");
 					UpdateFakespotDetails(result);
 					// Wait 3 seconds
 					setTimeout(pingForFakespotData, 3000);
 					break;
 				case amazonfs.StatusEnum.ANALYZING:
-					console.log("Status:ANALYZING - " + result.analysisPercent + "%  " + result.analysisNotes);
+					if (debug) console.log("FSStatus:ANALYZING - " + result.analysisPercent + "%  " + result.analysisNotes);
 					UpdateFakespotDetails(result);
 					// Wait 3 seconds
 					setTimeout(pingForFakespotData, 3000);
 					break;
 				case amazonfs.StatusEnum.NOT_ENOUGH_REVIEWS:
-					console.log("Status:NOT_ENOUGH_REVIEWS");
+					if (debug) console.log("FSStatus:NOT_ENOUGH_REVIEWS");
 					UpdateFakespotDetails(result);
 					break;
 				case amazonfs.StatusEnum.DONE:
-					console.log("Status:DONE " + result.productGrade + " - " + result.companyGrade +
+					if (debug) console.log("FSStatus:DONE " + result.productGrade + " - " + result.companyGrade +
 						" - " + result.twStars + " - AGE: " + result.analysisAge);
 					UpdateFakespotDetails(result);
 					break;
 				case amazonfs.StatusEnum.BAD:
-					console.log("Status:BAD");
+					if (debug) console.log("FSStatus:BAD");
 					UpdateFakespotDetails(result);
 					break;
 				case amazonfs.StatusEnum.NONE:
@@ -122,7 +124,7 @@ http://stackoverflow.com/a/5947280/277601
 	 * color/size will have a different CamelCamelCamel chart.
 	 * */
 	function onCamelRemove(){ 
-		console.log("Camel was removed");
+		//console.log("Camel was removed");
 		var element = document.getElementById('MyMiniCamelChart');
 		if (element != null) {
 			element.id = 'MyMiniCamelChartRemoved';
@@ -364,7 +366,7 @@ http://stackoverflow.com/a/5947280/277601
 	  tr = document.getElementById("MyFakespotReport_tr");
 	  td = document.getElementById("MyFakespotReport_td");
 	  if (tr == null || td == null) {
-		  console.log("Couldn't find tr/td");
+		  //console.log("Couldn't find tr/td");
 		  return;
 	  }
 	  
@@ -537,7 +539,7 @@ http://stackoverflow.com/a/5947280/277601
 	
 	
 	function removeFakespotProgressBar(){
-		console.log("removeFakespotProgressBar");
+		//console.log("removeFakespotProgressBar");
 		if (fakespotProgressBar != null){
 			fakespotProgressBar.destroy();
 			fakespotProgressBar = null;
@@ -617,9 +619,7 @@ http://stackoverflow.com/a/5947280/277601
 		// Save the current value, delete it, then create it again
 		if (fakespotProgressBar != null){
 			startProgress = fakespotProgressBar.value();
-			console.log("Found pbar: " + fakespotProgressBar.value());
 		}
-		console.log("ProgressBar: " + startProgress + " to " + progress);
 		removeFakespotProgressBar();
 		
 		// Create progress bar if it doesn't already exist
