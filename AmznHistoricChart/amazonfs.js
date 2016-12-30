@@ -262,6 +262,14 @@ http://stackoverflow.com/a/5947280/277601
 	};
 
 	/**
+	 * Convert all ascii chars to string
+	 * http://stackoverflow.com/a/528786/277601
+	 * */
+	function RemoveASCIICodes(str){
+		return str.replace(/&#(\d+);/g, function (m, n) { return String.fromCharCode(n); });
+	}
+	
+	/**
 	 * Gets the current analysis %
 	 * */
 	amazonfs.getAnalysisPercent = function(fsc, callback){
@@ -281,6 +289,7 @@ http://stackoverflow.com/a/5947280/277601
 				var result = myRe.exec(xhttp.responseText);
 				if (result != null && result.length > 1){
 					fsc.analysisNotes = result[1];
+					fsc.analysisNotes = RemoveASCIICodes(fsc.analysisNotes);
 				}
 				
 				// The page could be telling us we are getting redirected
@@ -378,6 +387,7 @@ http://stackoverflow.com/a/5947280/277601
 				if (resultProductName != null && resultProductName.length > 1){
 					if (debug) console.log("Found productName: " + resultProductName);
 					fsc.productName = resultProductName[1];
+					fsc.productName = RemoveASCIICodes(fsc.productName);
 				}
 				
 				// https://trustwerty.com/product/
@@ -395,6 +405,7 @@ http://stackoverflow.com/a/5947280/277601
 					if (debug) console.log("Found companyName: " + resultCompanyName);
 					fsc.companyGradeUrl = 'http://fakespot.com' + resultCompanyName[1];
 					fsc.companyName = resultCompanyName[2];
+					fsc.companyName = RemoveASCIICodes(fsc.companyName);
 				}
 				
 				var myAnalysisAgeRe = /reanalyze-analysis-msg/i;
