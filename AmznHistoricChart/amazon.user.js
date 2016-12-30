@@ -54,6 +54,7 @@ http://stackoverflow.com/a/5947280/277601
 					break;
 				case amazonfs.StatusEnum.BAD:
 					console.log("Status:BAD");
+					UpdateFakespotDetails(result);
 					break;
 				case amazonfs.StatusEnum.NONE:
 				default:
@@ -121,6 +122,7 @@ http://stackoverflow.com/a/5947280/277601
 	 * color/size will have a different CamelCamelCamel chart.
 	 * */
 	function onCamelRemove(){ 
+		console.log("Camel was removed");
 		var element = document.getElementById('MyMiniCamelChart');
 		if (element != null) {
 			element.id = 'MyMiniCamelChartRemoved';
@@ -130,6 +132,11 @@ http://stackoverflow.com/a/5947280/277601
 		removeElement('MyCamelSalesRankChart');
 		removeElement('MyFakespotReport');
 		removeElement('MyTWStarsUpdate'); // TODO: Add MyTWStarsUpdate
+		if (fakespotProgressBar != null) {
+			var destroyFS = fakespotProgressBar;
+			fakespotProgressBar = null;
+			destroyFS.destroy();
+		}
 		nwtcr_domAdditionsCount = 0;
 		
 		document.documentElement.addEventListener('DOMNodeInsertedIntoDocument', countDocAdditions, false);
@@ -281,21 +288,6 @@ http://stackoverflow.com/a/5947280/277601
 	  fsDiv.setAttribute('id', "MyFakespotReport");
 	  fsDiv.setAttribute('style', 'text-decoration: none; color: rgb(94, 170, 241); font-weight: 500; text-align: center; border-radius: 5px; box-shadow: rgba(0, 120, 0, 0.2) 1px 2px 2px 0px; background-color: rgb(255, 255, 255); position: relative; margin-bottom: 4px;padding:4px;max-width:270px');
 	  domLoc.element.insertBefore(fsDiv, domLoc.siblingToPlaceBefore);
-	  UpdateFakespotDetails(results);
-	  return true;
-	}
-	
-	/**
-	 * Finds current Fakespot Report and replaces it with up-to-date values
-	 * */
-	function UpdateFakespotDetails(results){
-	  var fsDiv = document.getElementById("MyFakespotReport");
-	  if (fsDiv == null) return;
-	  
-	  // Delete everything inside
-	  while (fsDiv.firstChild)
-		  fsDiv.removeChild(fsDiv.firstChild);
-	  
 	  var table = document.createElement('table');
 	  fsDiv.appendChild(table);
 	  var tbody = document.createElement('tbody');
@@ -336,11 +328,55 @@ http://stackoverflow.com/a/5947280/277601
 	//	}
 
 	  tr = document.createElement('tr');
+	  tr.setAttribute('id', "MyFakespotReport_tr");
 	  tbody.appendChild(tr);
 	  
 	  //// Product Grade
 	  td = document.createElement('td');
+	  td.setAttribute('id', "MyFakespotReport_td");
 	  tr.appendChild(td);
+	  {
+		  // The Busy Bar Container
+		  var busyDiv = document.createElement('div');
+		  busyDiv.setAttribute('id', "MyFakespotBusyBar");
+		  busyDiv.setAttribute('z-index', "10");
+		  //busyDiv.setAttribute('style', "width:50px;height:50px;position:absolute;top:0;margin: 0 auto");
+		  busyDiv.setAttribute('style', "width:100%;height:100%;position:absolute;top:1px;left:0px;box-sizing:border-box;");
+		  td.appendChild(busyDiv);
+		  // The Progress Bar Container
+		  var progressDiv = document.createElement('div');
+		  progressDiv.setAttribute('id', "MyFakespotProgressBar");
+		  progressDiv.setAttribute('z-index', "10");
+		  //progressDiv.setAttribute('style', "width:50px;height:50px;position:absolute;top:0;margin: 0 auto");
+		  progressDiv.setAttribute('style', "width:100%;height:100%;position:absolute;top:1px;left:0px;box-sizing:border-box;");
+		  td.appendChild(progressDiv);
+	  }
+	  UpdateFakespotDetails(results);
+	  return true;
+	}
+	
+	/**
+	 * Finds current Fakespot Report and replaces it with up-to-date values
+	 * */
+	function UpdateFakespotDetails(results){
+	  var tr, td, div, txt, span, color, hoverText, icon;
+	  
+	  tr = document.getElementById("MyFakespotReport_tr");
+	  td = document.getElementById("MyFakespotReport_td");
+	  if (tr == null || td == null) {
+		  console.log("Couldn't find tr/td");
+		  return;
+	  }
+	  
+	  // Delete everything inside beyond the first element
+	  // The first element has a 'td' which contains our progress bars
+	  while (tr.childNodes.length > 1)
+		  tr.removeChild(tr.childNodes[1]);
+	  // Delete everything inside beyond the second element
+	  // The first two elements are the progress bars
+	  while (td.childNodes.length > 2)
+		  td.removeChild(td.childNodes[2]);
+	  
 	  if (results.status == amazonfs.StatusEnum.WAITING_FOR_PAGE_GENERATION){
 		  hoverText = "This is a product that Fakespot has not analyzed yet.\r\n" +
 		              "Please wait while analysis happens or click to\r\n" +
@@ -479,35 +515,136 @@ http://stackoverflow.com/a/5947280/277601
 		  span.setAttribute('style', 'color:#64b5f6;');
 	  }
 	  
-	  // var label = document.createElement('a');
-	  // label.setAttribute('class', 'nav_a');
-	  // label.setAttribute('href', url);
-	  // label.setAttribute('rel', 'noreferrer');
-	  // 
-	  // var img = document.createElement('img');
-	  // img.setAttribute('src', imgUrl);
-	  // img.setAttribute('alt', imgTitle); // Alt if image does not exist
-	  // img.setAttribute('title', imgTitle); // Title should make hover text
-	  // img.setAttribute('width', width);
-	  // img.setAttribute('height', height);
-      // 
-	  // if (domNodeOptions.addTitle) {
-		 //  var span = document.createElement('span');
-		 //  span.setAttribute('style', 'font-size : large; color : #9933ff;');
-		 //  span.innerHTML = imgTitle;
-      // 
-		 //  fsDiv.appendChild(span);
-		 //  fsDiv.appendChild(document.createElement('br'));
-	  // }
-	  // fsDiv.appendChild(label);
-	  // fsDiv.appendChild(document.createElement('br'));
-	  // fsDiv.appendChild(document.createElement('br'));
-	  // label.appendChild(img);
-	  //console.log("found " + domNodeOptions.parentId);
-	  
+	  if (results.status == amazonfs.StatusEnum.WAITING_FOR_PAGE_GENERATION){
+		  updateFakespotProgressBar(5);
+	  } else if (results.status == amazonfs.StatusEnum.ANALYZING){
+		  updateFakespotProgressBar(results.analysisPercent);
+	  } else {
+		  if (results.status == amazonfs.StatusEnum.NOT_ENOUGH_REVIEWS ||
+			results.status == amazonfs.StatusEnum.DONE ||
+			results.status == amazonfs.StatusEnum.BAD){
+				stopFakespotBusyBar();
+				updateFakespotProgressBar(-1);
+		  }
+	  }
+
+	  if (busyBarFirstTime){
+		startFakespotBusyBar();
+		busyBarFirstTime = false;
+	  }
 	  return true;
 	}
-
+	
+	
+	function removeFakespotProgressBar(){
+		console.log("removeFakespotProgressBar");
+		if (fakespotProgressBar != null){
+			fakespotProgressBar.destroy();
+			fakespotProgressBar = null;
+		}
+		var progressDiv = document.getElementById("MyFakespotProgressBar");
+		// Delete everything inside
+		while (progressDiv.firstChild)
+			progressDiv.removeChild(progressDiv.firstChild);
+	}
+	
+	function removeFakespotBusyBar(){
+		//console.log("removeFakespotBusyBar");
+		if (fakespotBusyBar != null){
+			fakespotBusyBar.destroy();
+			fakespotBusyBar = null;
+		}
+		var busyDiv = document.getElementById("MyFakespotBusyBar");
+		// Delete everything inside
+		while (busyDiv.firstChild)
+			busyDiv.removeChild(busyDiv.firstChild);
+	}
+	
+	var fakespotProgressBar = null;
+	var fakespotProgressLastTargetValue = 0;
+	var fakespotBusyBar = null;
+	var busyBarActive = true;
+	var busyBarFirstTime = true;
+	
+	function stopFakespotBusyBar(){
+		//console.log("stopFakespotBusyBar");
+		busyBarActive = false;
+		removeFakespotBusyBar();
+	}
+	
+	function startFakespotBusyBar(){
+		if (busyBarActive == false) return;
+		//console.log("startFakespotBusyBar");
+		// Amazon's website somehow hides the progress bar within half a second of displaying it the first time
+		// so we need to remove the old one and add a new one
+		removeFakespotBusyBar();
+		var busyDuration = 5000;
+		fakespotBusyBar = new ProgressBar.Line('#MyFakespotBusyBar', {
+			svgStyle: {
+				//height:"100%",
+				//transform: 'scale(-1,1)',
+				position: 'absolute',
+				top: '0px',
+				display: 'block',
+				height: '15px',
+				width: '100%'
+			},
+			color: 'rgba(153, 204, 255, 0.2)',
+			//trailColor: '#eee',
+			warnings: true,
+			strokeWidth: 2,
+			duration: busyDuration,
+			easing: 'linear'
+		});
+		fakespotBusyBar.set(0);
+		
+		fakespotBusyBar.animate(1);
+		setTimeout(function() {
+			startFakespotBusyBar();
+		}, busyDuration);
+	}
+	
+	function updateFakespotProgressBar(progress) {
+		// If progress==-1, or progress > 100, destroy the bar
+		if (progress < 0 || progress > 100) {
+			removeFakespotProgressBar();
+			return;
+		}
+		
+		var startProgress = 0;
+		// Amazon's website somehow hides the progress bar within half a second of displaying it the first time
+		// so instead, let's just recreate it every few seconds.
+		// Save the current value, delete it, then create it again
+		if (fakespotProgressBar != null){
+			startProgress = fakespotProgressBar.value();
+			console.log("Found pbar: " + fakespotProgressBar.value());
+		}
+		console.log("ProgressBar: " + startProgress + " to " + progress);
+		removeFakespotProgressBar();
+		
+		// Create progress bar if it doesn't already exist
+		if (fakespotProgressBar == null){
+			fakespotProgressBar = new ProgressBar.MyBox('#MyFakespotProgressBar', {
+				svgStyle: {
+					position: 'absolute',
+					top: '0px',
+					height:"100%",
+					display: 'block',
+					width: '100%'
+				},
+				color: '#333',
+				trailColor: '#eee',
+				warnings: true,
+				trailWidth: 0.8,
+				strokeWidth: 2,
+				duration: 1500,
+				easing: 'linear'
+			});
+			fakespotProgressBar.set(startProgress);
+		}
+		
+		fakespotProgressBar.animate(progress / 100);
+	}
 	/**
 	 * Gets the product ASIN (i.e. B01MRZIY0P)
 	 * It tries to find it by first searching for Id named ASIN or asin,

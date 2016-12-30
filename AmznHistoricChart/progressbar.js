@@ -1733,7 +1733,7 @@ module.exports = {
     // Higher level API, different shaped progress bars
     Line: require('./line'),
     Circle: require('./circle'),
-    SemiCircle: require('./semicircle'),
+    MyBox: require('./mybox'),
 
     // Lower level API to use any SVG path
     Path: require('./path'),
@@ -1747,7 +1747,7 @@ module.exports = {
     utils: require('./utils')
 };
 
-},{"./circle":2,"./line":3,"./path":5,"./semicircle":6,"./shape":7,"./utils":8}],5:[function(require,module,exports){
+},{"./circle":2,"./line":3,"./path":5,"./mybox":6,"./shape":7,"./utils":8}],5:[function(require,module,exports){
 // Lower level API to animate any kind of svg path
 
 var Tweenable = require('shifty');
@@ -1922,54 +1922,96 @@ Path.prototype._easing = function _easing(easing) {
 module.exports = Path;
 
 },{"./utils":8,"shifty":1}],6:[function(require,module,exports){
-// Semi-SemiCircle shaped progress bar
+// MyBox shaped progress bar
 
 var Shape = require('./shape');
-var Circle = require('./circle');
 var utils = require('./utils');
 
-var SemiCircle = function SemiCircle(container, options) {
-    // Use one arc to form a SemiCircle
-    // See this answer http://stackoverflow.com/a/10477334/1446092
-    this._pathTemplate =
-        'M 50,50 m -{radius},0' +
-        ' a {radius},{radius} 0 1 1 {2radius},0';
+var MyBox = function MyBox(container, options) {
+    //this._pathTemplate = 'M 5 0 L 5 37 300 37 300 0 Z';
+    this._pathTemplate = 'M 5 9 L 5 36 A4,4 0 0,0 9,40 L 296 40 A4,4 0 0,0 300,36 L 300 9 A4,4 0 0,0 296,5 L 9 5 A4,4 0 0,0 5,9';
 
-    this.containerAspectRatio = 2;
+    //this.containerAspectRatio = 5.4;
 
     Shape.apply(this, arguments);
 };
 
-SemiCircle.prototype = new Shape();
-SemiCircle.prototype.constructor = SemiCircle;
+MyBox.prototype = new Shape();
+MyBox.prototype.constructor = MyBox;
 
-SemiCircle.prototype._initializeSvg = function _initializeSvg(svg, opts) {
-    svg.setAttribute('viewBox', '0 0 100 50');
+MyBox.prototype._initializeSvg = function _initializeSvg(svg, opts) {
+    svg.setAttribute('viewBox', '0 0 305 45');
 };
 
-SemiCircle.prototype._initializeTextContainer = function _initializeTextContainer(
-    opts,
-    container,
-    textContainer
-) {
-    if (opts.text.style) {
-        // Reset top style
-        textContainer.style.top = 'auto';
-        textContainer.style.bottom = '0';
+MyBox.prototype._pathString = function _pathString(opts) {
+    //var widthOfWider = opts.strokeWidth;
+    //if (opts.trailWidth && opts.trailWidth > opts.strokeWidth) {
+    //    widthOfWider = opts.trailWidth;
+    //}
 
-        if (opts.text.alignToBottom) {
-            utils.setStyle(textContainer, 'transform', 'translate(-50%, 0)');
-        } else {
-            utils.setStyle(textContainer, 'transform', 'translate(-50%, 50%)');
-        }
-    }
+    //var r = 50 - widthOfWider / 2;
+
+    return utils.render(this._pathTemplate, {
+       // radius: r,
+       // '2radius': r * 2
+    });
 };
 
-// Share functionality with Circle, just have different path
-SemiCircle.prototype._pathString = Circle.prototype._pathString;
-SemiCircle.prototype._trailString = Circle.prototype._trailString;
+MyBox.prototype._trailString = function _trailString(opts) {
+    return this._pathString(opts);
+};
 
-module.exports = SemiCircle;
+
+module.exports = MyBox;
+
+// Semi-SemiCircle shaped progress bar
+
+////var Shape = require('./shape');
+////var Circle = require('./circle');
+////var utils = require('./utils');
+////
+////var SemiCircle = function SemiCircle(container, options) {
+////    // Use one arc to form a SemiCircle
+////    // See this answer http://stackoverflow.com/a/10477334/1446092
+////    this._pathTemplate =
+////        'M 50,50 m -{radius},0' +
+////        ' a {radius},{radius} 0 1 1 {2radius},0';
+////
+////    this.containerAspectRatio = 2;
+////
+////    Shape.apply(this, arguments);
+////};
+////
+////SemiCircle.prototype = new Shape();
+////SemiCircle.prototype.constructor = SemiCircle;
+////
+////SemiCircle.prototype._initializeSvg = function _initializeSvg(svg, opts) {
+////    svg.setAttribute('viewBox', '0 0 100 50');
+////};
+////
+////SemiCircle.prototype._initializeTextContainer = function _initializeTextContainer(
+////    opts,
+////    container,
+////    textContainer
+////) {
+////    if (opts.text.style) {
+////        // Reset top style
+////        textContainer.style.top = 'auto';
+////        textContainer.style.bottom = '0';
+////
+////        if (opts.text.alignToBottom) {
+////            utils.setStyle(textContainer, 'transform', 'translate(-50%, 0)');
+////        } else {
+////            utils.setStyle(textContainer, 'transform', 'translate(-50%, 50%)');
+////        }
+////    }
+////};
+////
+////// Share functionality with Circle, just have different path
+////SemiCircle.prototype._pathString = Circle.prototype._pathString;
+////SemiCircle.prototype._trailString = Circle.prototype._trailString;
+////
+////module.exports = SemiCircle;
 
 },{"./circle":2,"./shape":7,"./utils":8}],7:[function(require,module,exports){
 // Base object for different progress bar shapes
