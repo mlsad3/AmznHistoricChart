@@ -517,6 +517,11 @@ http://stackoverflow.com/a/5947280/277601
 		  span.setAttribute('style', 'color:#64b5f6;');
 	  }
 	  
+	  if (busyBarFirstTime){
+		startFakespotBusyBar();
+		busyBarFirstTime = false;
+	  }
+	  
 	  if (results.status == amazonfs.StatusEnum.WAITING_FOR_PAGE_GENERATION){
 		  updateFakespotProgressBar(5);
 	  } else if (results.status == amazonfs.StatusEnum.ANALYZING){
@@ -525,15 +530,14 @@ http://stackoverflow.com/a/5947280/277601
 		  if (results.status == amazonfs.StatusEnum.NOT_ENOUGH_REVIEWS ||
 			results.status == amazonfs.StatusEnum.DONE ||
 			results.status == amazonfs.StatusEnum.BAD){
-				stopFakespotBusyBar();
-				updateFakespotProgressBar(-1);
+				updateFakespotProgressBar(100, 500);
+				setTimeout(function() {
+					stopFakespotBusyBar();
+					updateFakespotProgressBar(-1);
+				}, 500);
 		  }
 	  }
 
-	  if (busyBarFirstTime){
-		startFakespotBusyBar();
-		busyBarFirstTime = false;
-	  }
 	  return true;
 	}
 	
@@ -563,7 +567,6 @@ http://stackoverflow.com/a/5947280/277601
 	}
 	
 	var fakespotProgressBar = null;
-	var fakespotProgressLastTargetValue = 0;
 	var fakespotBusyBar = null;
 	var busyBarActive = true;
 	var busyBarFirstTime = true;
@@ -606,7 +609,7 @@ http://stackoverflow.com/a/5947280/277601
 		}, busyDuration);
 	}
 	
-	function updateFakespotProgressBar(progress) {
+	function updateFakespotProgressBar(progress, forceDuration) {
 		// If progress==-1, or progress > 100, destroy the bar
 		if (progress < 0 || progress > 100) {
 			removeFakespotProgressBar();
@@ -632,12 +635,12 @@ http://stackoverflow.com/a/5947280/277601
 					display: 'block',
 					width: '100%'
 				},
-				color: '#333',
+				color: '#9cc',
 				trailColor: '#eee',
 				warnings: true,
 				trailWidth: 0.8,
 				strokeWidth: 2,
-				duration: 1500,
+				duration: (forceDuration != null? forceDuration : 1500),
 				easing: 'linear'
 			});
 			fakespotProgressBar.set(startProgress);
