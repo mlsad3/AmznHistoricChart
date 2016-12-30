@@ -343,7 +343,7 @@ http://stackoverflow.com/a/5947280/277601
 		  busyDiv.setAttribute('id', "MyFakespotBusyBar");
 		  busyDiv.setAttribute('z-index', "10");
 		  //busyDiv.setAttribute('style', "width:50px;height:50px;position:absolute;top:0;margin: 0 auto");
-		  busyDiv.setAttribute('style', "width:100%;height:100%;position:absolute;top:1px;left:0px;box-sizing:border-box;");
+		  busyDiv.setAttribute('style', "width:96%;height:100%;position:absolute;top:1px;left:2%;box-sizing:border-box;");
 		  td.appendChild(busyDiv);
 		  // The Progress Bar Container
 		  var progressDiv = document.createElement('div');
