@@ -534,6 +534,7 @@ http://stackoverflow.com/a/5947280/277601
 				setTimeout(function() {
 					stopFakespotBusyBar();
 					updateFakespotProgressBar(-1);
+					CompletelyRemoveSVGBarHolders();
 				}, 500);
 		  }
 	  }
@@ -541,7 +542,16 @@ http://stackoverflow.com/a/5947280/277601
 	  return true;
 	}
 	
+	/**
+	 * The SVG holders cause the 'title' popup info to be for product instead of either product or company (based on where mouse is)
+	 * So we need to completely remove the holders after progress bar use is done
+	 * */
+	function CompletelyRemoveSVGBarHolders(){
+		removeElement('MyFakespotProgressBar');
+		removeElement('MyFakespotBusyBar');
+	}
 	
+
 	function removeFakespotProgressBar(){
 		//console.log("removeFakespotProgressBar");
 		if (fakespotProgressBar != null){
