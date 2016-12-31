@@ -208,7 +208,8 @@ http://stackoverflow.com/a/5947280/277601
 
 	  var div = document.createElement('div');
 	  div.setAttribute('id', details.nodeName);
-	  div.setAttribute('style', 'border-radius: 5px;padding: 6px;box-shadow: rgba(0, 120, 0, 0.2) 1px 2px 2px 0px; margin-bottom: 4px;max-width:270px');
+	  var maxWidth = details.imgWidth <= 270 ? 270 : details.imgWidth;
+	  div.setAttribute('style', 'border-radius: 5px;padding: 6px;box-shadow: rgba(0, 120, 0, 0.2) 1px 2px 2px 0px; margin-bottom: 4px;max-width:' + maxWidth + 'px');
 	  
 	  var label = document.createElement('a');
 	  label.setAttribute('class', 'nav_a');
