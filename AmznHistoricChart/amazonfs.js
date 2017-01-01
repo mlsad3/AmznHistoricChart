@@ -228,6 +228,16 @@ http://stackoverflow.com/a/5947280/277601
 					amazonfs.analyzeUrlForProductPage(fsc, callback);
 					return;
 				}
+				
+				myRe = /Not enough reviews for analysis/i;
+				result = myRe.exec(xhttp.responseText);
+				if (result != null){
+					fsc.status = amazonfs.StatusEnum.NOT_ENOUGH_REVIEWS;
+					if (debug) console.log("Not enough reviews");
+					callback(fsc);
+					return;
+				}
+				
 				fsc.status = amazonfs.StatusEnum.WAITING_FOR_PAGE_GENERATION;
 				// The page is still being generated, so just return
 				callback(fsc);
