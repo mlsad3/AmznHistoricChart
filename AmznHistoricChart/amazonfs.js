@@ -14,6 +14,13 @@ http://stackoverflow.com/a/5947280/277601
 	}
 	
 	/**
+	 * Clear cached value for url
+	 * */
+	amazonfs.clearCache = function(amazonUrl){
+		fakespotCache.delete(amazonUrl);
+	}
+	
+	/**
 	 * Decide what stage to skip to, based on cached values
 	 * */
 	amazonfs.triage = function(amazonUrl, callback){

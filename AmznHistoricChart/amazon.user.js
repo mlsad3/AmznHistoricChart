@@ -336,7 +336,8 @@ http://stackoverflow.com/a/5947280/277601
 	  
 	  //// Product Grade
 	  td = document.createElement('td');
-	  td.setAttribute('id', "MyFakespotReport_td");
+	  td.setAttribute('id', "MyFakespotReport_tdProductGrade");
+	  td.addEventListener('click', OpenFakespotProductLink);
 	  tr.appendChild(td);
 	  {
 		  // The Busy Bar Container
@@ -362,10 +363,11 @@ http://stackoverflow.com/a/5947280/277601
 	 * Finds current Fakespot Report and replaces it with up-to-date values
 	 * */
 	function UpdateFakespotDetails(results){
+	  fakespotResults = results;
 	  var tr, td, div, txt, span, color, hoverText, icon;
 	  
 	  tr = document.getElementById("MyFakespotReport_tr");
-	  td = document.getElementById("MyFakespotReport_td");
+	  td = document.getElementById("MyFakespotReport_tdProductGrade");
 	  if (tr == null || td == null) {
 		  //console.log("Couldn't find tr/td");
 		  return;
@@ -402,7 +404,6 @@ http://stackoverflow.com/a/5947280/277601
 	  }
 	  td.setAttribute('title', hoverText);
 	  if (results.productUrl != null){
-		  td.setAttribute('onclick', "window.open('" + results.productUrl + "')");
 		  td.setAttribute('style', 'cursor: pointer;width:25%;');
 	  } else {
 		  td.setAttribute('style', 'width:25%;');
@@ -444,7 +445,10 @@ http://stackoverflow.com/a/5947280/277601
 		  }
 		  td.setAttribute('title', hoverText);
 		  if (results.companyGradeUrl != null){
-			  td.setAttribute('onclick', "window.open('" + results.companyGradeUrl + "')");
+			  td.addEventListener('click', function() {
+					// Open new tab
+					window.open( results.companyGradeUrl );
+			  });
 			  td.setAttribute('style', 'cursor: pointer;width:25%;');
 		  } else {
 			  td.setAttribute('style', 'width:25%;');
@@ -486,7 +490,10 @@ http://stackoverflow.com/a/5947280/277601
 		  }
 		  td.setAttribute('title', hoverText);
 		  if (results.twStarsUrl != null){
-			  td.setAttribute('onclick', "window.open('" + results.twStarsUrl + "')");
+			  td.addEventListener('click', function() {
+					// Open new tab
+					window.open( results.twStarsUrl );
+			  });
 			  td.setAttribute('style', 'cursor: pointer;width:50%;');
 		  } else {
 			  td.setAttribute('style', 'width:50%;');
@@ -541,6 +548,25 @@ http://stackoverflow.com/a/5947280/277601
 	  }
 
 	  return true;
+	}
+	
+	var fakespotResults = null;
+	function OpenFakespotProductLink(){
+		if (fakespotResults == null) return;
+		if (fakespotResults.status == amazonfs.StatusEnum.NOT_ENOUGH_REVIEWS ||
+		    fakespotResults.status == amazonfs.StatusEnum.DONE){
+			// Clear cache for item if it is in a DONE state
+			// and user is navigating to Fakespot. There is a possibility that they
+			// tell Fakespot to re-analize
+			chrome.runtime.sendMessage({
+				action: 'fakespot_clearcache',
+				url:    fakespotResults.amazonUrl
+			});
+		}
+		if (fakespotResults.productUrl != null && fakespotResults.productUrl != ""){
+			// Open new tab
+			window.open( fakespotResults.productUrl );
+		}
 	}
 	
 	/**
