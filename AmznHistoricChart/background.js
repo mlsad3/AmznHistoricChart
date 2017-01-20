@@ -17,6 +17,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, callback) {
     } else if (request.action == "fakespot_clearcache") {
 		amazonfs.clearCache(request.url);
         return true; // prevents the callback from being called too early on return
+    } else if (request.action == "amazonccc_xhttp") {
+		amazonccc.triage(request.asin, callback);
+        return true; // prevents the callback from being called too early on return
     } else if (request.action == "camelimage_xhttp") {
 		console.log("Trying image");
 		amazoncamel.loadImageData(request, callback);

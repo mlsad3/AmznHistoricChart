@@ -1,6 +1,6 @@
 http://stackoverflow.com/a/5947280/277601
 (function(amazonfs, $, undefined) {
-	var debug = 0;
+	var debug = false;
 	// Keep info on the last 100 Amazon products
 	var fakespotCache = new LRUMap(100);
 	

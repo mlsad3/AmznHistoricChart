@@ -67,6 +67,41 @@ http://stackoverflow.com/a/5947280/277601
 		});
 	}
 
+	
+	/** Get latest details from CamelCamelCamel
+	 *   Status will be:
+	 *     NONE - Ping again in 3 seconds
+	 *     BAD - Do not continue
+	 *     DONE - Do not continue, should have graph urls and capabilities
+	 * */
+	function pingForCamelCamelCamelData(ASIN){
+		chrome.runtime.sendMessage({
+			method: 'GET',
+			action: 'amazonccc_xhttp',
+			asin:   ASIN
+		}, function(result) {
+			//if (debug) console.log("Got CCC data back: " + result.productGrade + " - " + result.companyGrade + " - " + result.twStars);
+			if (debug) console.log("   CCC Returned status: " + result.status);
+			
+			switch(result.status){
+				case amazonccc.StatusEnum.DONE:
+					//if (debug) console.log("CCCStatus:DONE " + result.productGrade + " - " + result.companyGrade +
+					//	" - " + result.twStars + " - AGE: " + result.analysisAge);
+					UpdateCamelDetails(result);
+					break;
+				case amazonccc.StatusEnum.BAD:
+					if (debug) console.log("CCCStatus:BAD");
+					UpdateCamelDetails(result);
+					break;
+				case amazonccc.StatusEnum.NONE:
+				default:
+					// Wait 3 seconds
+					setTimeout(function() {pingForCamelCamelCamelData(ASIN);}, 3000);
+					break;
+			}
+		});
+	}
+
 	function isAlreadyAdded(elementName){
 	  var element = document.getElementById(elementName);
 	  return element != null;
@@ -144,19 +179,6 @@ http://stackoverflow.com/a/5947280/277601
 		document.documentElement.addEventListener('DOMNodeInsertedIntoDocument', countDocAdditions, false);
 		setTimeout(function(){onDomChange2();}, 500);	
 	};
-
-	function pingForCamelImage(nodeId, camelUrl){
-		chrome.runtime.sendMessage({
-			action: 'camelimage_xhttp',
-			url: camelUrl
-		}, function(result) {
-			var node = document.getElementById(nodeId);
-			if (node != null && result != null) {
-				node.src = result; //window.URL.createObjectURL(result);
-				node.setAttribute('style', 'visibility:visible');
-			}
-		});
-	}
 
 	/**
 	 * Grabs location to put new node
@@ -260,7 +282,6 @@ http://stackoverflow.com/a/5947280/277601
 	  //div.appendChild(document.createElement('br'));
 	  //console.log("found " + domNodeOptions.parentId);
 	  domLoc.element.insertBefore(div, domLoc.siblingToPlaceBefore);
-	  pingForCamelImage(imgId, details.imgSrc);
 	  if (domNodeOptions.addListener) div.addEventListener('DOMNodeRemovedFromDocument', onCamelRemove, false);
 
 	  return true;
@@ -685,6 +706,7 @@ http://stackoverflow.com/a/5947280/277601
 		
 		fakespotProgressBar.animate(progress / 100);
 	}
+	
 	/**
 	 * Gets the product ASIN (i.e. B01MRZIY0P)
 	 * It tries to find it by first searching for Id named ASIN or asin,
@@ -704,7 +726,7 @@ http://stackoverflow.com/a/5947280/277601
 		}
 		return ASIN;
 	}
-
+	
 	/**
 	 * Adds CamelCamelCamel graph and Fakespot results to Amazon webpage.
 	 * */
@@ -724,152 +746,201 @@ http://stackoverflow.com/a/5947280/277601
 		ASIN = getASIN();
 
 
-		if (amzTLD != null && ASIN != null) {
-			// Clicking on this link will provide a larger historical image inside the same Amazon window
-			var strNewALink = encodeURI("http://" + amzPre + "amazon." + amzTLD + "/gp/product/" + ASIN + "/?ie=UTF8&showcamellargegraph=1");
-			// After the larger historical price window (inside Amazon) is up, clicking on the image again will take you
-			// to CamelCamelCamel.com
-			var strCamelLink = encodeURI("http://camelcamelcamel.com/product/" + ASIN);
-			var strCamelSalesRankLink = encodeURI("http://camelcamelcamel.com/product/" + ASIN + "?active=sales_rank");
-			var imgSmallLoc = encodeURI("http://charts.camelcamelcamel.com/us/" + ASIN + "/amazon.png?force=1&zero=0&w=350&h=300&desired=false&legend=1&ilt=1&tp=all&fo=0&lang=en");
-			var imgLargeLoc = encodeURI("http://charts.camelcamelcamel.com/us/" + ASIN + "/amazon.png?force=1&zero=0&w=500&h=400&desired=false&legend=1&ilt=1&tp=all&fo=0&lang=en");
-			var imgLargeSalesRankLoc = encodeURI("http://charts.camelcamelcamel.com/us/" + ASIN + "/sales-rank.png?force=1&zero=0&w=500&h=250&legend=1&ilt=1&tp=all&fo=0&lang=en");
+		if (amzTLD == null || ASIN == null || ASIN == "") return;
+		
+		// Clicking on this link will provide a larger historical image inside the same Amazon window
+		var strNewALink = encodeURI("http://" + amzPre + "amazon." + amzTLD + "/gp/product/" + ASIN + "/?ie=UTF8&showcamellargegraph=1");
+		// After the larger historical price window (inside Amazon) is up, clicking on the image again will take you
+		// to CamelCamelCamel.com
+		var strCamelLink = encodeURI("http://camelcamelcamel.com/product/" + ASIN);
+		var strCamelSalesRankLink = encodeURI("http://camelcamelcamel.com/product/" + ASIN + "?active=sales_rank");
 
-			/*	var domNodeOptionsForLargeSalesRankGraph = [];
-			 *	domNodeOptionsForLargeSalesRankGraph.push(
-			 *		{"afterSiblingNotAsChild":true,  "parentId":'title_feature_div',         "getBy":"id"},
-			 *		{"afterSiblingNotAsChild":false, "parentId":'title_feature_div',         "getBy":"id"},
-			 *		{"afterSiblingNotAsChild":false, "parentId":'product-title_feature_div', "getBy":"id"},
-			 *		{"afterSiblingNotAsChild":false, "parentId":'title_row',                 "getBy":"id"},
-			 *		{"afterSiblingNotAsChild":false, "parentId":'title',                     "getBy":"id"},
-			 *		{"afterSiblingNotAsChild":false, "parentId":'parseasinTitle',            "getBy":"class"}
-			 *		);
+		/*	var domNodeOptionsForLargeSalesRankGraph = [];
+		 *	domNodeOptionsForLargeSalesRankGraph.push(
+		 *		{"afterSiblingNotAsChild":true,  "parentId":'title_feature_div',         "getBy":"id"},
+		 *		{"afterSiblingNotAsChild":false, "parentId":'title_feature_div',         "getBy":"id"},
+		 *		{"afterSiblingNotAsChild":false, "parentId":'product-title_feature_div', "getBy":"id"},
+		 *		{"afterSiblingNotAsChild":false, "parentId":'title_row',                 "getBy":"id"},
+		 *		{"afterSiblingNotAsChild":false, "parentId":'title',                     "getBy":"id"},
+		 *		{"afterSiblingNotAsChild":false, "parentId":'parseasinTitle',            "getBy":"class"}
+		 *		);
+		 * */
+		var domNodeOptionsForLargeCamelGraph = [];
+		domNodeOptionsForLargeCamelGraph.push(
+			{"afterSiblingNotAsChild":true,  "parentId":'title_feature_div',         "getBy":"id"},
+			{"afterSiblingNotAsChild":false, "parentId":'title_feature_div',         "getBy":"id"},
+			{"afterSiblingNotAsChild":false, "parentId":'product-title_feature_div', "getBy":"id"},
+			{"afterSiblingNotAsChild":false, "parentId":'title_row',                 "getBy":"id"},
+			{"afterSiblingNotAsChild":false, "parentId":'title',                     "getBy":"id"},
+			{"afterSiblingNotAsChild":false, "parentId":'parseasinTitle',            "getBy":"class"}
+			);
+		var domNodeOptionsForMiniCamelGraph = [];
+		domNodeOptionsForMiniCamelGraph.push(
+			// Page example: Electric shavers (or deal of the day) (which was once http://www.amazon.com/gp/product/B003YJAZZ4 )
+			//   This should NOT use buy-box_feature_div, since it doesn't seem to be created at the time the DOM is built :-/
+			{"parentId":'buybox',              "getBy":"id"},
+			{"parentId":'buy-box_feature_div', "getBy":"id"},
+			{"parentId":'dmusic_buy_box',      "getBy":"id"},
+			{"parentId":'buy',                 "getBy":"class"},
+			{"parentId":'buying',              "getBy":"class"},
+			//   These should be a last-check since it puts it in wrong spot for other pages like http://www.amazon.com/gp/product/B00U3FPN4U
+			{"parentId":'price_feature_div',   "getBy":"id"},
+			// Page example: Baby K'tan Original Baby Carrier amazon.com/dp/B00FSKX266
+			{"parentId":'buybox_feature_div',  "getBy":"id"},
+			{"parentId":'buybox',              "getBy":"data-feature-name"}
+			);
+		
+		// Decide which link to add:
+		var res;
+		if ((m = window.location.href.match(new RegExp("\\&showcamellargegraph=1\\b"))) != null) {
+			// Different sections of Amazon have different html, and so I need to
+			// try to add the Historical Data to multiple locations (once one works, quit)
+			
+			// Note, the ordering is important in below, search in that priority
+			// Page example: Electric shavers (which was once http://www.amazon.com/gp/product/B003YJAZZ4 )
+			//    This should NOT use title_feature_div, since it has a css max-height:55px. Instead, put it at the same level but just AFTER
+			
+			/*	// Camel Historic Sales Rank graphs -- Do not enable until we add settings page
+			 *	var camelSalesDetails = {
+			 *		'imgLink'   : strCamelSalesRankLink,
+			 *		'imgTitle'  : "Historical Sales Rank",
+			 *		'imgWidth'  : 500,
+			 *		'imgHeight' : 250,
+			 *		'linkLink'  : null,
+			 *		'linkText'  : null,
+			 *		'nodeName'  : 'MyCamelSalesRankChart'
+			 *	};
+			 *	for (var i = 0; i < domNodeOptionsForLargeSalesRankGraph.length; i++){
+			 *		domNodeOptionsForLargeSalesRankGraph[i].addListener = false;
+			 *		domNodeOptionsForLargeSalesRankGraph[i].addTitle    = true;
+			 *		// console.info("Camel Historic Sales Rank graphs - trying " + domNodeOptionsForLargeSalesRankGraph[i].parentId);
+			 *		// Wait for settings page before adding sales rank
+			 *		res = addLinkImg(camelSalesDetails, domNodeOptionsForLargeSalesRankGraph[i]);
+			 *		if (res) break;
+			 *	}
 			 * */
-			var domNodeOptionsForLargeCamelGraph = [];
-			domNodeOptionsForLargeCamelGraph.push(
-				{"afterSiblingNotAsChild":true,  "parentId":'title_feature_div',         "getBy":"id"},
-				{"afterSiblingNotAsChild":false, "parentId":'title_feature_div',         "getBy":"id"},
-				{"afterSiblingNotAsChild":false, "parentId":'product-title_feature_div', "getBy":"id"},
-				{"afterSiblingNotAsChild":false, "parentId":'title_row',                 "getBy":"id"},
-				{"afterSiblingNotAsChild":false, "parentId":'title',                     "getBy":"id"},
-				{"afterSiblingNotAsChild":false, "parentId":'parseasinTitle',            "getBy":"class"}
-				);
-			var domNodeOptionsForMiniCamelGraph = [];
-			domNodeOptionsForMiniCamelGraph.push(
-				// Page example: Electric shavers (or deal of the day) (which was once http://www.amazon.com/gp/product/B003YJAZZ4 )
-				//   This should NOT use buy-box_feature_div, since it doesn't seem to be created at the time the DOM is built :-/
-				{"parentId":'buybox',              "getBy":"id"},
-				{"parentId":'buy-box_feature_div', "getBy":"id"},
-				{"parentId":'dmusic_buy_box',      "getBy":"id"},
-				{"parentId":'buy',                 "getBy":"class"},
-				{"parentId":'buying',              "getBy":"class"},
-				//   These should be a last-check since it puts it in wrong spot for other pages like http://www.amazon.com/gp/product/B00U3FPN4U
-				{"parentId":'price_feature_div',   "getBy":"id"},
-				// Page example: Baby K'tan Original Baby Carrier amazon.com/dp/B00FSKX266
-				{"parentId":'buybox_feature_div',  "getBy":"id"},
-				{"parentId":'buybox',              "getBy":"data-feature-name"}
-				);
 			
-			// Decide which link to add:
-			var res;
-			if ((m = window.location.href.match(new RegExp("\\&showcamellargegraph=1\\b"))) != null) {
-				// Different sections of Amazon have different html, and so I need to
-				// try to add the Historical Data to multiple locations (once one works, quit)
-				
-				// Note, the ordering is important in below, search in that priority
-				// Page example: Electric shavers (which was once http://www.amazon.com/gp/product/B003YJAZZ4 )
-				//    This should NOT use title_feature_div, since it has a css max-height:55px. Instead, put it at the same level but just AFTER
-				
-				/*	// Camel Historic Sales Rank graphs -- Do not enable until we add settings page
-				 *	var camelSalesDetails = {
-				 *		'imgLink'   : strCamelSalesRankLink,
-				 *		'imgSrc'    : imgLargeSalesRankLoc,
-				 *		'imgTitle'  : "Historical Sales Rank",
-				 *		'imgWidth'  : 500,
-				 *		'imgHeight' : 250,
-				 *		'linkLink'  : null,
-				 *		'linkText'  : null,
-				 *		'nodeName'  : 'MyCamelSalesRankChart'
-				 *	};
-				 *	for (var i = 0; i < domNodeOptionsForLargeSalesRankGraph.length; i++){
-				 *		domNodeOptionsForLargeSalesRankGraph[i].addListener = false;
-				 *		domNodeOptionsForLargeSalesRankGraph[i].addTitle    = true;
-				 *		// console.info("Camel Historic Sales Rank graphs - trying " + domNodeOptionsForLargeSalesRankGraph[i].parentId);
-				 *		// Wait for settings page before adding sales rank
-				 *		res = addLinkImg(camelSalesDetails, domNodeOptionsForLargeSalesRankGraph[i]);
-				 *		if (res) break;
-				 *	}
-				 * */
-				
-				
-				var camelLargeDetails = {
-					'imgLink'   : strCamelLink,
-					'imgSrc'    : imgLargeLoc,
-					'imgTitle'  : "HistoricPriceShopper - Click to go to CamelCamelCamel",
-					'imgWidth'  : 500,
-					'imgHeight' : 400,
-					'linkLink'  : null,
-					'linkText'  : null,
-					'nodeName'  : 'MyCamelChart'
-				};
-				// Camel Historic price graph
-				for (var i = 0; i < domNodeOptionsForLargeCamelGraph.length; i++){
-					domNodeOptionsForLargeCamelGraph[i].addListener = false;
-					domNodeOptionsForLargeCamelGraph[i].addTitle    = false;
-					// console.info("Camel Large Historic price graph - trying " + domNodeOptionsForLargeCamelGraph[i].parentId);
-					res = addLinkImg(camelLargeDetails, domNodeOptionsForLargeCamelGraph[i]);
-					if (res) break;
-				}
-			}
-
-			var results = {
-				"productUrl"        : "",
-				"status"            : amazonfs.StatusEnum.NONE,
-				"analysisPercent"   : 0,
-				"analysisNotes"     : "",
-				"productGrade"      : "?",
-				"productGradeNotes" : null,
-				"productName"       : "",
-				"companyGrade"      : "?",
-				"companyGradeNotes" : null,
-				"companyName"       : "",
-				"companyGradeUrl"   : null,
-				"analysisAge"       : "new",
-				"twStarsUrl"        : null,
-				"twStars"           : -1
-				};			// Add Fakespot results
-			pingForFakespotData();
-			for (var i = 0; i < domNodeOptionsForMiniCamelGraph.length; i++){
-				// console.log("Got here for " + domNodeOptionsForMiniCamelGraph[i].parentId);
-				res = addFakespotReport(results, domNodeOptionsForMiniCamelGraph[i]);
-				if (res) break;
-			}
 			
-			var camelDetails = {
-				'imgLink'   : strNewALink,
-				'imgSrc'    : imgSmallLoc,
-				'imgTitle'  : "Click to see larger image - HistoricPriceShopper",
-				'imgWidth'  : 175,
-				'imgHeight' : 100,
-				'linkLink'  : strCamelLink,
-				'linkText'  : "Track at CamelCamelCamel",
-				'nodeName'  : 'MyMiniCamelChart'
+			var camelLargeDetails = {
+				'imgLink'   : strCamelLink,
+				'imgTitle'  : "HistoricPriceShopper - Click to go to CamelCamelCamel",
+				'imgWidth'  : 500,
+				'imgHeight' : 400,
+				'linkLink'  : null,
+				'linkText'  : null,
+				'nodeName'  : 'MyCamelChart'
 			};
-			
-			// Camel Historic price mini-graph
-			for (var i = 0; i < domNodeOptionsForMiniCamelGraph.length; i++){
-				domNodeOptionsForMiniCamelGraph[i].addListener            = true;
-				domNodeOptionsForMiniCamelGraph[i].addTitle               = false;
-				domNodeOptionsForMiniCamelGraph[i].afterSiblingNotAsChild = false;
-				// console.info("Camel Historic price mini-graph - trying " + domNodeOptionsForMiniCamelGraph[i].parentId);
-				res = addLinkImg(camelDetails, domNodeOptionsForMiniCamelGraph[i]);
+			// Camel Historic price graph
+			for (var i = 0; i < domNodeOptionsForLargeCamelGraph.length; i++){
+				domNodeOptionsForLargeCamelGraph[i].addListener = false;
+				domNodeOptionsForLargeCamelGraph[i].addTitle    = false;
+				// console.info("Camel Large Historic price graph - trying " + domNodeOptionsForLargeCamelGraph[i].parentId);
+				res = addLinkImg(camelLargeDetails, domNodeOptionsForLargeCamelGraph[i]);
 				if (res) break;
 			}
-		} else {
-			//console.log("Didn't find Amazon stuff");
+		}
+
+		var results = {
+			"productUrl"        : "",
+			"status"            : amazonfs.StatusEnum.NONE,
+			"analysisPercent"   : 0,
+			"analysisNotes"     : "",
+			"productGrade"      : "?",
+			"productGradeNotes" : null,
+			"productName"       : "",
+			"companyGrade"      : "?",
+			"companyGradeNotes" : null,
+			"companyName"       : "",
+			"companyGradeUrl"   : null,
+			"analysisAge"       : "new",
+			"twStarsUrl"        : null,
+			"twStars"           : -1
+			};
+		// Get CamelCamelCamel website info
+		pingForCamelCamelCamelData(ASIN);
+		// Add Fakespot results
+		pingForFakespotData();
+		for (var i = 0; i < domNodeOptionsForMiniCamelGraph.length; i++){
+			// console.log("Got here for " + domNodeOptionsForMiniCamelGraph[i].parentId);
+			res = addFakespotReport(results, domNodeOptionsForMiniCamelGraph[i]);
+			if (res) break;
+		}
+		
+		var camelDetails = {
+			'imgLink'   : strNewALink,
+			'imgTitle'  : "Click to see larger image - HistoricPriceShopper",
+			'imgWidth'  : 175,
+			'imgHeight' : 100,
+			'linkLink'  : strCamelLink,
+			'linkText'  : "Track at CamelCamelCamel",
+			'nodeName'  : 'MyMiniCamelChart'
+		};
+		
+		// Camel Historic price mini-graph
+		for (var i = 0; i < domNodeOptionsForMiniCamelGraph.length; i++){
+			domNodeOptionsForMiniCamelGraph[i].addListener            = true;
+			domNodeOptionsForMiniCamelGraph[i].addTitle               = false;
+			domNodeOptionsForMiniCamelGraph[i].afterSiblingNotAsChild = false;
+			// console.info("Camel Historic price mini-graph - trying " + domNodeOptionsForMiniCamelGraph[i].parentId);
+			res = addLinkImg(camelDetails, domNodeOptionsForMiniCamelGraph[i]);
+			if (res) break;
 		}
 		
 	}
+
+	var cccRequestNum = 0;
+	
+	function pingForCamelImage(nodeId, requestNum, camelUrl){
+		chrome.runtime.sendMessage({
+			action: 'camelimage_xhttp',
+			url: camelUrl
+		}, function(result) {
+			if (debug) console.log("Got img data for " + camelUrl);
+			// Check if this was a stale request (the picture didn't load before they changed pic type)
+			if (requestNum != cccRequestNum) return;
+			var node = document.getElementById(nodeId);
+			if (node != null && result != null) {
+				node.src = result; //window.URL.createObjectURL(result);
+				node.setAttribute('style', 'visibility:visible');
+			}
+		});
+	}
+
+	/**
+	 * From CamelCamelCamel.com results, of which graphs exist,
+	 * update the placeholder with a graph for product.
+	 * */
+	function UpdateCamelDetails(result){
+		if (debug) console.log("Got Camel details");
+		// Based on which graphs are available, we will show in order of priority
+		var urlBase = "";
+		if (result.graphAmazonURL != null){
+			urlBase = result.graphAmazonURL;
+		} else if (result.graph3PNewURL != null){
+			urlBase = result.graph3PNewURL;
+		} else if (result.graph3PUsedURL != null){
+			urlBase = result.graph3PUsedURL;
+		} else {
+			// None are available, so just set it to Amazon graph, and it will display "Not enough info"
+			urlBase = "http://charts.camelcamelcamel.com/us/" + result.asin + "/amazon.png?force=1&zero=0&desired=false&legend=1&ilt=1&tp=all&fo=0&lang=en";
+		}
+		var imgSmallLoc = "&w=350&h=300";
+		var imgLargeLoc = "&w=500&h=400";
+		var imgLargeSalesRankLoc = "&w=500&h=250";
+		
+		cccRequestNum++;
+		
+		var imgIdList = ["MyCamelChart_img", "MyMiniCamelChart_img", "MyCamelSalesRankChart_img"];
+		var imgSizes = [imgLargeLoc, imgSmallLoc, imgLargeSalesRankLoc];
+		for (var i = 0, size = imgIdList.length; i < size; i++){
+			var imgElement = document.getElementById(imgIdList[i]);
+			if (imgElement != null){
+				pingForCamelImage(imgIdList[i], cccRequestNum, urlBase + imgSizes[i]);
+			}
+		}
+	}
+	
+
 	// Close namespace amznhc (http://stackoverflow.com/a/5947280/277601)
 } ( window.amznhc = window.amznhc || {}, jQuery ));
 
