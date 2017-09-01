@@ -772,22 +772,24 @@ http://stackoverflow.com/a/5947280/277601
 			{"afterSiblingNotAsChild":false, "parentId":'product-title_feature_div', "getBy":"id"},
 			{"afterSiblingNotAsChild":false, "parentId":'title_row',                 "getBy":"id"},
 			{"afterSiblingNotAsChild":false, "parentId":'title',                     "getBy":"id"},
-			{"afterSiblingNotAsChild":false, "parentId":'parseasinTitle',            "getBy":"class"}
+			{"afterSiblingNotAsChild":false, "parentId":'parseasinTitle',            "getBy":"class"},
+			{"afterSiblingNotAsChild":false, "parentId":'dv-dp-title-content',       "getBy":"id"}
 			);
 		var domNodeOptionsForMiniCamelGraph = [];
 		domNodeOptionsForMiniCamelGraph.push(
 			// Page example: Electric shavers (or deal of the day) (which was once http://www.amazon.com/gp/product/B003YJAZZ4 )
 			//   This should NOT use buy-box_feature_div, since it doesn't seem to be created at the time the DOM is built :-/
-			{"parentId":'buybox',              "getBy":"id"},
-			{"parentId":'buy-box_feature_div', "getBy":"id"},
-			{"parentId":'dmusic_buy_box',      "getBy":"id"},
-			{"parentId":'buy',                 "getBy":"class"},
-			{"parentId":'buying',              "getBy":"class"},
+			{"parentId":'buybox',               "getBy":"id"},
+			{"parentId":'buy-box_feature_div',  "getBy":"id"},
+			{"parentId":'dmusic_buy_box',       "getBy":"id"},
+			{"parentId":'buy',                  "getBy":"class"},
+			{"parentId":'buying',               "getBy":"class"},
 			//   These should be a last-check since it puts it in wrong spot for other pages like http://www.amazon.com/gp/product/B00U3FPN4U
-			{"parentId":'price_feature_div',   "getBy":"id"},
+			{"parentId":'price_feature_div',    "getBy":"id"},
 			// Page example: Baby K'tan Original Baby Carrier amazon.com/dp/B00FSKX266
-			{"parentId":'buybox_feature_div',  "getBy":"id"},
-			{"parentId":'buybox',              "getBy":"data-feature-name"}
+			{"parentId":'buybox_feature_div',   "getBy":"id"},
+			{"parentId":'buybox',               "getBy":"data-feature-name"},
+			{"parentId":'dv-action-box-wrapper',"getBy":"id"}
 			);
 		
 		// Decide which link to add:
