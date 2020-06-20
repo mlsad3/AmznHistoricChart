@@ -204,13 +204,32 @@ http://stackoverflow.com/a/5947280/277601
 			if (elements.length == 0) return result;
 			result.element = elements[0];
 		}
-		if (result.element == null) return result;
+		if (result.element == null) {
+			//console.log("Could not find " + domNodeOptions.parentId)
+			return result;
+		} else {
+			//console.log("Found " + domNodeOptions.parentId);
+		}
 		if (domNodeOptions.afterSiblingNotAsChild) {
+			//console.log("Putting after sibling")
 			result.siblingToPlaceBefore = result.element.nextSibling;
 			if (result.element != null) 
 				result.element = result.element.parentNode;
 			if (result.element == null) return result;
+		} else if (domNodeOptions.beforeSiblingNotAsChild) {
+			//console.log("Putting before self")
+			result.siblingToPlaceBefore = result.element;
+			if (result.element != null) 
+				result.element = result.element.parentNode;
+			if (result.element == null) return result;
+		} else if (domNodeOptions.firstChildOfParent) {
+			result.siblingToPlaceBefore = result.element.parentNode.firstChild;
+			result.element = result.siblingToPlaceBefore.parentNode;
+		} else if (domNodeOptions.firstChildOfGrandparent) {
+			result.siblingToPlaceBefore = result.element.parentNode.parentNode.firstChild;
+			result.element = result.siblingToPlaceBefore.parentNode;
 		} else {
+			//console.log("Just putting it inside " + domNodeOptions.parentId)
 			result.siblingToPlaceBefore = result.element.firstChild;
 		}
 		result.found = true;
@@ -773,7 +792,7 @@ http://stackoverflow.com/a/5947280/277601
 			{"afterSiblingNotAsChild":false, "parentId":'title_row',                 "getBy":"id"},
 			{"afterSiblingNotAsChild":false, "parentId":'title',                     "getBy":"id"},
 			{"afterSiblingNotAsChild":false, "parentId":'parseasinTitle',            "getBy":"class"},
-			{"afterSiblingNotAsChild":false, "parentId":'dv-dp-title-content',       "getBy":"id"}
+			{"afterSiblingNotAsChild":false, "parentId":'dv-dp-title-content',       "getBy":"id"},
 			);
 		var domNodeOptionsForMiniCamelGraph = [];
 		domNodeOptionsForMiniCamelGraph.push(
@@ -783,13 +802,17 @@ http://stackoverflow.com/a/5947280/277601
 			{"parentId":'buy-box_feature_div',  "getBy":"id"},
 			{"parentId":'dmusic_buy_box',       "getBy":"id"},
 			{"parentId":'buy',                  "getBy":"class"},
+			// Page example: Kindle version of Automotive Ethernet amazon.com/dp/B073QTJBND
+			{"parentId":'checkoutButtonId',     "getBy":"id",  "firstChildOfGrandparent":true},
 			{"parentId":'buying',               "getBy":"class"},
 			//   These should be a last-check since it puts it in wrong spot for other pages like http://www.amazon.com/gp/product/B00U3FPN4U
 			{"parentId":'price_feature_div',    "getBy":"id"},
+			// Page example: Autonet Ethernet book amazon.com/dp/1107183227
+			{"parentId":'submit.add-to-cart',   "getBy":"id",  "firstChildOfParent":true},
 			// Page example: Baby K'tan Original Baby Carrier amazon.com/dp/B00FSKX266
 			{"parentId":'buybox_feature_div',   "getBy":"id"},
 			{"parentId":'buybox',               "getBy":"data-feature-name"},
-			{"parentId":'dv-action-box-wrapper',"getBy":"id"}
+			{"parentId":'dv-action-box-wrapper',"getBy":"id"},
 			);
 		
 		// Decide which link to add:
