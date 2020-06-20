@@ -23,7 +23,7 @@
 		if (ccc == null) {
 			ccc = {
 				"asin"              : asin,
-				"camelUrl"          : "http://camelcamelcamel.com/product/" + asin,
+				"camelUrl"          : "https://camelcamelcamel.com/product/" + asin,
 				"productUrl"        : null,
 				"status"            : amazonccc.StatusEnum.NONE,
 				"graphAmazonURL"    : null,
@@ -66,7 +66,7 @@
 				var myRe = /You are being.*camelcamelcamel.com(\/[^"]+)">redirected/i;
 				var result = myRe.exec(xhttp.responseText);
 				if (ccc.productUrl == null && result != null && result.length > 1){
-					var productUrl = "http://camelcamelcamel.com" + result[1];
+					var productUrl = "https://camelcamelcamel.com" + result[1];
 					ccc.productUrl = productUrl;
 					if (debug) console.log("Found product URL as: " + ccc.productUrl);
 					amazonccc.getPageHome(ccc, callback);
@@ -82,7 +82,7 @@
 					if (isDisabledResult != null) {
 						ccc.graphAmazonURL = null;
 					} else {
-						ccc.graphAmazonURL = "http://charts.camelcamelcamel.com/us/" + ccc.asin + "/amazon.png?force=1&zero=0&desired=false&legend=1&ilt=1&tp=all&fo=0&lang=en";
+						ccc.graphAmazonURL = "https://charts.camelcamelcamel.com/us/" + ccc.asin + "/amazon.png?force=1&zero=0&desired=false&legend=1&ilt=1&tp=all&fo=0&lang=en";
 					}
 					if (debug) console.log("Found graphAmazonURL as: " + ccc.graphAmazonURL);
 				} else {
@@ -99,7 +99,7 @@
 					if (isDisabledResult != null) {
 						ccc.graph3PNewURL = null;
 					} else {
-						ccc.graph3PNewURL = "http://charts.camelcamelcamel.com/us/" + ccc.asin + "/new.png?force=1&zero=0&desired=false&legend=1&ilt=1&tp=all&fo=0&lang=en";
+						ccc.graph3PNewURL = "https://charts.camelcamelcamel.com/us/" + ccc.asin + "/new.png?force=1&zero=0&desired=false&legend=1&ilt=1&tp=all&fo=0&lang=en";
 					}
 					if (debug) console.log("Found graph3PNewURL as: " + ccc.graph3PNewURL);
 				} else {
@@ -116,14 +116,14 @@
 					if (isDisabledResult != null) {
 						ccc.graph3PUsedURL = null;
 					} else {
-						ccc.graph3PUsedURL = "http://charts.camelcamelcamel.com/us/" + ccc.asin + "/used.png?force=1&zero=0&desired=false&legend=1&ilt=1&tp=all&fo=0&lang=en";
+						ccc.graph3PUsedURL = "https://charts.camelcamelcamel.com/us/" + ccc.asin + "/used.png?force=1&zero=0&desired=false&legend=1&ilt=1&tp=all&fo=0&lang=en";
 					}
 					if (debug) console.log("Found graph3PUsedURL as: " + ccc.graph3PUsedURL);
 				} else {
 					console.error("Quitting5 amazonccc.getPageHome Didn't find old");
 					ccc.graph3PUsedURL = null;
 				}
-				ccc.graphSalesRankURL = "http://charts.camelcamelcamel.com/us/" + ccc.asin + "/sales-rank.png?force=1&zero=0&legend=1&ilt=1&tp=all&fo=0&lang=en";
+				ccc.graphSalesRankURL = "https://charts.camelcamelcamel.com/us/" + ccc.asin + "/sales-rank.png?force=1&zero=0&legend=1&ilt=1&tp=all&fo=0&lang=en";
 				if (debug) console.log("Found graphSalesRankURL as: " + ccc.graphSalesRankURL);
 				
 				ccc.status = amazonccc.StatusEnum.DONE;

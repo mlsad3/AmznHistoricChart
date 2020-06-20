@@ -2,10 +2,10 @@
 // @name           Historic Price Shopper
 // ==/UserScript==
 
-http://stackoverflow.com/a/5947280/277601
+// https://stackoverflow.com/a/5947280/277601
 (function(amznhc, $, undefined) {
 
-	// http://stackoverflow.com/a/24649134/277601
+	// https://stackoverflow.com/a/24649134/277601
 	// Avoid recursive frame insertion...
 	// var extensionOrigin = 'chrome-extension://' + chrome.runtime.id;
 	// if (!location.ancestorOrigins.contains(extensionOrigin)) {
@@ -729,7 +729,7 @@ http://stackoverflow.com/a/5947280/277601
 	/**
 	 * Gets the product ASIN (i.e. B01MRZIY0P)
 	 * It tries to find it by first searching for Id named ASIN or asin,
-	 * and then it tries the current page's URL: http://.*amazon.com.*?\/([A-Z0-9]{10})\/
+	 * and then it tries the current page's URL: https://.*amazon.com.*?\/([A-Z0-9]{10})\/
 	 * */
 	function getASIN() {
 		var ASIN = "";
@@ -768,11 +768,11 @@ http://stackoverflow.com/a/5947280/277601
 		if (amzTLD == null || ASIN == null || ASIN == "") return;
 		
 		// Clicking on this link will provide a larger historical image inside the same Amazon window
-		var strNewALink = encodeURI("http://" + amzPre + "amazon." + amzTLD + "/gp/product/" + ASIN + "/?ie=UTF8&showcamellargegraph=1");
+		var strNewALink = encodeURI("https://" + amzPre + "amazon." + amzTLD + "/gp/product/" + ASIN + "/?ie=UTF8&showcamellargegraph=1");
 		// After the larger historical price window (inside Amazon) is up, clicking on the image again will take you
 		// to CamelCamelCamel.com
-		var strCamelLink = encodeURI("http://camelcamelcamel.com/product/" + ASIN);
-		var strCamelSalesRankLink = encodeURI("http://camelcamelcamel.com/product/" + ASIN + "?active=sales_rank");
+		var strCamelLink = encodeURI("https://camelcamelcamel.com/product/" + ASIN);
+		var strCamelSalesRankLink = encodeURI("https://camelcamelcamel.com/product/" + ASIN + "?active=sales_rank");
 
 		/*	var domNodeOptionsForLargeSalesRankGraph = [];
 		 *	domNodeOptionsForLargeSalesRankGraph.push(
@@ -796,7 +796,7 @@ http://stackoverflow.com/a/5947280/277601
 			);
 		var domNodeOptionsForMiniCamelGraph = [];
 		domNodeOptionsForMiniCamelGraph.push(
-			// Page example: Electric shavers (or deal of the day) (which was once http://www.amazon.com/gp/product/B003YJAZZ4 )
+			// Page example: Electric shavers (or deal of the day) (which was once https://www.amazon.com/gp/product/B003YJAZZ4 )
 			//   This should NOT use buy-box_feature_div, since it doesn't seem to be created at the time the DOM is built :-/
 			{"parentId":'buybox',               "getBy":"id"},
 			{"parentId":'buy-box_feature_div',  "getBy":"id"},
@@ -805,7 +805,7 @@ http://stackoverflow.com/a/5947280/277601
 			// Page example: Kindle version of Automotive Ethernet amazon.com/dp/B073QTJBND
 			{"parentId":'checkoutButtonId',     "getBy":"id",  "firstChildOfGrandparent":true},
 			{"parentId":'buying',               "getBy":"class"},
-			//   These should be a last-check since it puts it in wrong spot for other pages like http://www.amazon.com/gp/product/B00U3FPN4U
+			//   These should be a last-check since it puts it in wrong spot for other pages like https://www.amazon.com/gp/product/B00U3FPN4U
 			{"parentId":'price_feature_div',    "getBy":"id"},
 			// Page example: Autonet Ethernet book amazon.com/dp/1107183227
 			{"parentId":'submit.add-to-cart',   "getBy":"id",  "firstChildOfParent":true},
@@ -824,7 +824,7 @@ http://stackoverflow.com/a/5947280/277601
 			// try to add the Historical Data to multiple locations (once one works, quit)
 			
 			// Note, the ordering is important in below, search in that priority
-			// Page example: Electric shavers (which was once http://www.amazon.com/gp/product/B003YJAZZ4 )
+			// Page example: Electric shavers (which was once https://www.amazon.com/gp/product/B003YJAZZ4 )
 			//    This should NOT use title_feature_div, since it has a css max-height:55px. Instead, put it at the same level but just AFTER
 			
 			/*	// Camel Historic Sales Rank graphs -- Do not enable until we add settings page
@@ -958,7 +958,7 @@ http://stackoverflow.com/a/5947280/277601
 			urlBase = result.graph3PUsedURL;
 		} else {
 			// None are available, so just set it to Amazon graph, and it will display "Not enough info"
-			urlBase = "http://charts.camelcamelcamel.com/us/" + result.asin + "/amazon.png?force=1&zero=0&desired=false&legend=1&ilt=1&tp=all&fo=0&lang=en";
+			urlBase = "https://charts.camelcamelcamel.com/us/" + result.asin + "/amazon.png?force=1&zero=0&desired=false&legend=1&ilt=1&tp=all&fo=0&lang=en";
 		}
 		var imgSmallLoc = "&w=350&h=300";
 		var imgLargeLoc = "&w=500&h=400";
@@ -977,7 +977,7 @@ http://stackoverflow.com/a/5947280/277601
 	}
 	
 
-	// Close namespace amznhc (http://stackoverflow.com/a/5947280/277601)
+	// Close namespace amznhc (https://stackoverflow.com/a/5947280/277601)
 } ( window.amznhc = window.amznhc || {}, jQuery ));
 
 amznhc.addAmazonPriceGraph();

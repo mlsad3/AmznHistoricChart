@@ -1,4 +1,4 @@
-http://stackoverflow.com/a/5947280/277601
+// https://stackoverflow.com/a/5947280/277601
 (function(amazonfs, $, undefined) {
 	var debug = false;
 	// Keep info on the last 100 Amazon products
@@ -196,7 +196,7 @@ http://stackoverflow.com/a/5947280/277601
 			fsc.status = amazonfs.StatusEnum.BAD;
 			callback(fsc);
 		};
-		// http://fakespot.com/analyze?utf8=%E2%9C%93&url=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE&commit=Analyze
+		// https://fakespot.com/analyze?utf8=%E2%9C%93&url=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE&commit=Analyze
 		// https://www.fakespot.com//analyze?utf8=%E2%9C%93&form_type=home_page&url=https%3A%2F%2Fwww.amazon.com%2Fdp%2FB08BHN46G3&button=
 		fsc.productUrl = 'https://www.fakespot.com/analyze?utf8=%E2%9C%93&form_type=home_page&url=' + encodeURIComponent(fsc.amazonUrl) + '&button=';
 		xhttp.open('GET', fsc.productUrl, true);
@@ -284,7 +284,7 @@ http://stackoverflow.com/a/5947280/277601
 
 	/**
 	 * Convert all ascii chars to string
-	 * http://stackoverflow.com/a/528786/277601
+	 * https://stackoverflow.com/a/528786/277601
 	 * */
 	function RemoveASCIICodes(str){
 		return str.replace(/&#(\d+);/g, function (m, n) { return String.fromCharCode(n); });
@@ -467,6 +467,6 @@ http://stackoverflow.com/a/5947280/277601
 		return true;
 	};
 
-	// Close namespace amazonfs (http://stackoverflow.com/a/5947280/277601)
+	// Close namespace amazonfs (https://stackoverflow.com/a/5947280/277601)
 } ( window.amazonfs = window.amazonfs || {}, jQuery ));
 
