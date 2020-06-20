@@ -115,9 +115,10 @@ http://stackoverflow.com/a/5947280/277601
 			fsc.status = amazonfs.StatusEnum.BAD;
 			callback(fsc);
 		};
-		xhttp.open('GET', 'http://fakespot.com', true);
+		xhttp.open('GET', 'https://www.fakespot.com', true);
 		// setRequestHeader must be called *after* open
 		xhttp.setRequestHeader('Accept', '*/*;q=0.5, text/javascript, application/javascript, application/ecmascript, application/x-ecmascript');
+		xhttp.withCredentials = true;
 		xhttp.send();
 		return true;
 	};
@@ -139,7 +140,7 @@ http://stackoverflow.com/a/5947280/277601
 				var result = myRe.exec(xhttp.responseText);
 				if (debug) console.log("Found product as: " + result);
 				if (result != null && result.length > 1){
-					var productUrl = "http://fakespot.com" + result[1];
+					var productUrl = "https://www.fakespot.com" + result[1];
 					// Update Cache
 					fsc.productUrl = productUrl;
 					amazonfs.getProductPage(fsc, callback);
@@ -150,7 +151,7 @@ http://stackoverflow.com/a/5947280/277601
 				myRe = /You are being.*fakespot.com(\/product\/[^"]+)">redirected/i;
 				result = myRe.exec(xhttp.responseText);
 				if (result != null && result.length > 1){
-					var productUrl = "http://fakespot.com" + result[1];
+					var productUrl = "https://www.fakespot.com" + result[1];
 					fsc.productUrl = productUrl;
 					if (debug) console.log("Found product ID as: " + productId);
 					amazonfs.waitForPageGeneration(fsc, callback);
@@ -196,7 +197,8 @@ http://stackoverflow.com/a/5947280/277601
 			callback(fsc);
 		};
 		// http://fakespot.com/analyze?utf8=%E2%9C%93&url=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE&commit=Analyze
-		fsc.productUrl = 'http://fakespot.com/analyze?utf8=%E2%9C%93&url=' + encodeURIComponent(fsc.amazonUrl) + '&commit=Analyze';
+		// https://www.fakespot.com//analyze?utf8=%E2%9C%93&form_type=home_page&url=https%3A%2F%2Fwww.amazon.com%2Fdp%2FB08BHN46G3&button=
+		fsc.productUrl = 'https://www.fakespot.com/analyze?utf8=%E2%9C%93&form_type=home_page&url=' + encodeURIComponent(fsc.amazonUrl) + '&button=';
 		xhttp.open('GET', fsc.productUrl, true);
 		// setRequestHeader must be called *after* open
 		xhttp.setRequestHeader('Accept', '*/*;q=0.5, text/javascript, application/javascript, application/ecmascript, application/x-ecmascript');
@@ -206,6 +208,7 @@ http://stackoverflow.com/a/5947280/277601
 		formData.append("utf8", "✓");
 		formData.append("url", fsc.amazonUrl);
 		formData.append("commit", "Analyze");
+		xhttp.withCredentials = true;
 		// if (debug) console.log("going for request: " + );
 		// alert('test');
 		xhttp.send(formData);
@@ -265,7 +268,7 @@ http://stackoverflow.com/a/5947280/277601
 			fsc.status = amazonfs.StatusEnum.BAD;
 			callback(fsc);
 		};
-		xhttp.open('GET', 'http://fakespot.com/product_status/' + fsc.productId, true);
+		xhttp.open('GET', 'https://www.fakespot.com/product_status/' + fsc.productId, true);
 		// setRequestHeader must be called *after* open
 		if (fsc.ETag != ""){
 			xhttp.setRequestHeader('If-None-Match', fsc.ETag);
@@ -274,6 +277,7 @@ http://stackoverflow.com/a/5947280/277601
 		xhttp.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 		xhttp.setRequestHeader('Upgrade-Insecure-Requests', '1');
 		xhttp.setRequestHeader('Accept', '*/*;q=0.5, text/javascript, application/javascript, application/ecmascript, application/x-ecmascript');
+		xhttp.withCredentials = true;
 		xhttp.send();
 		return true;
 	};
@@ -341,15 +345,14 @@ http://stackoverflow.com/a/5947280/277601
 			// callback to clean up the communication port.
 			callback(fsc);
 		};
-		xhttp.open('GET', 'http://fakespot.com/analysis_status/' + fsc.productId, true);
-		// setRequestHeader must be called *after* open
-		if (fsc.ETag != ""){
-			xhttp.setRequestHeader('If-None-Match', fsc.ETag);
-		}
+		var analysis_percent_url = 'https://www.fakespot.com/analysis_status/' + fsc.productId;
+		if (debug) console.log("Analysis Percent URL: " + analysis_percent_url);
+		xhttp.open('GET', analysis_percent_url, true);
 		xhttp.setRequestHeader('X-CSRF-Token', fsc.csrfToken);
 		xhttp.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 		xhttp.setRequestHeader('Upgrade-Insecure-Requests', '1');
-		xhttp.setRequestHeader('Accept', '*/*;q=0.5, text/javascript, application/javascript, application/ecmascript, application/x-ecmascript');
+		xhttp.setRequestHeader('Accept', 'application/json, text/javascript, */*; q=0.01');
+		xhttp.withCredentials = true;
 		xhttp.send();
 		return true;
 	};
@@ -368,26 +371,18 @@ http://stackoverflow.com/a/5947280/277601
 			if (debug) console.log("Got text: " + xhttp.responseText);
 			if (xhttp.readyState == 4 && xhttp.status == 200){
 				if (debug) console.log("Finished getting product page");
-				var myCompGradeLineRe = /Company Grade:.+"([^"]+link-company-grade[^"]+)"/i;
+				var myCompGradeLineRe = /"company-grade-box[^"]+grade-([abcdfu])[^"]*"/i;
 				var resultCompGradeLine = myCompGradeLineRe.exec(xhttp.responseText);
 				if (resultCompGradeLine != null && resultCompGradeLine.length > 1){
-					var myCompGradeRe = /grade-([abcdfu])/;
-					var resultCompGrade = myCompGradeRe.exec(resultCompGradeLine[1]);
-					if (resultCompGrade != null && resultCompGrade.length > 1){
-						if (debug) console.log("Found resultCompGrade: " + resultCompGrade);
-						fsc.companyGrade = resultCompGrade[1] == 'u' ? "?" : resultCompGrade[1];
-					}
+					if (debug) console.log("Found resultCompGrade: " + resultCompGradeLine);
+					fsc.companyGrade = resultCompGradeLine[1] === 'u' ? "?" : resultCompGradeLine[1];
 				}
 
-				var myProdGradeLineRe = /class="([^"]+comp-grade[^"]+)"/i;
+				var myProdGradeLineRe = /"grade-box[^"]+grade-([abcdfu])[^"]*"/i;
 				var resultProdGradeLine = myProdGradeLineRe.exec(xhttp.responseText);
 				if (resultProdGradeLine != null && resultProdGradeLine.length > 1){
-					var myProdGradeRe = /grade-([abcdfu])/;
-					var resultProdGrade = myProdGradeRe.exec(resultProdGradeLine[1]);
-					if (resultProdGrade != null && resultProdGrade.length > 1){
-						if (debug) console.log("Found resultProdGrade: " + resultProdGrade);
-						fsc.productGrade = resultProdGrade[1] == 'u' ? "?" : resultProdGrade[1];
-					}
+					if (debug) console.log("Found resultProdGrade: " + resultProdGradeLine);
+					fsc.productGrade = resultProdGradeLine[1] === 'u' ? "?" : resultProdGradeLine[1];
 				}
 				
 				// class="star-rating" ... rating="2.1"
@@ -416,11 +411,11 @@ http://stackoverflow.com/a/5947280/277601
 				}
 				
 				// company-label">Sold by&nbsp;<a class="link-highlight" href="/company/general-hydroponics">General Hydroponics</a>
-				var myCompanyNameRe = /company-label">Sold by[^<]+<[^>]+href="(\/company\/[^"]+)">([^<]+)/i;
+				var myCompanyNameRe = /merchant-info">Sold by[^<]+<[^>]+href="(\/company\/[^"]+)">([^<]+)/i;
 				var resultCompanyName = myCompanyNameRe.exec(xhttp.responseText);
 				if (resultCompanyName != null && resultCompanyName.length > 2){
 					if (debug) console.log("Found companyName: " + resultCompanyName);
-					fsc.companyGradeUrl = 'http://fakespot.com' + resultCompanyName[1];
+					fsc.companyGradeUrl = 'https://www.fakespot.com' + resultCompanyName[1];
 					fsc.companyName = resultCompanyName[2];
 					fsc.companyName = RemoveASCIICodes(fsc.companyName);
 				}
@@ -432,7 +427,7 @@ http://stackoverflow.com/a/5947280/277601
 				}
 				
 				// Get any updated ProductId (Different from the productId used for page generation)
-				myRe = /id="frm-result-(\w+)/;
+				myRe = /id="frm-result-amazon-(\w+)/;
 				result = myRe.exec(xhttp.responseText);
 				if (result != null && result.length > 1){
 					var productId = result[1];
@@ -441,9 +436,14 @@ http://stackoverflow.com/a/5947280/277601
 				
 				console.log("Sending back: " + fsc.productGrade + " - " + fsc.companyGrade + " - " + fsc.twStars);
 				// Update Cache
-				fsc.status = fsc.productGrade == "?" ? amazonfs.StatusEnum.ANALYZING : amazonfs.StatusEnum.DONE;
-				fsc.analysisPercent = fsc.productGrade == "?" ? 0 : 100;
+				if (fsc.analysisPercent >= 100) {
+					fsc.status = amazonfs.StatusEnum.DONE;
+				} else {
+					fsc.status = fsc.productGrade == "?" ? amazonfs.StatusEnum.ANALYZING : amazonfs.StatusEnum.DONE;
+					fsc.analysisPercent = fsc.productGrade == "?" ? 0 : 100;
+				}
 				fsc.analysisNotes   = "From Fakespot.com";
+				if (debug) console.log('  ^--> status: ' + fsc.status + ', percent: ' + fsc.analysisPercent + ', notes: ' + fsc.analysisNotes);
 				callback(fsc);
 			} else {
 				fsc.status = amazonfs.StatusEnum.BAD;
@@ -462,6 +462,7 @@ http://stackoverflow.com/a/5947280/277601
 		// setRequestHeader must be called *after* open
 		xhttp.setRequestHeader('Upgrade-Insecure-Requests', '1');
 		xhttp.setRequestHeader('Accept', '*/*;q=0.5, text/javascript, application/javascript, application/ecmascript, application/x-ecmascript');
+		xhttp.withCredentials = true;
 		xhttp.send();
 		return true;
 	};

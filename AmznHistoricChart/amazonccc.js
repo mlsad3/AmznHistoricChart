@@ -1,5 +1,5 @@
 (function(amazonccc, $, undefined) {
-	var debug = true;
+	var debug = false;
 	// Keep info on the last 100 Amazon products
 	var cccCache = new LRUMap(100);
 	
