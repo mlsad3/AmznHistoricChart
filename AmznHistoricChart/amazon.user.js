@@ -813,6 +813,8 @@ http://stackoverflow.com/a/5947280/277601
 			{"parentId":'buybox_feature_div',   "getBy":"id"},
 			{"parentId":'buybox',               "getBy":"data-feature-name"},
 			{"parentId":'dv-action-box-wrapper',"getBy":"id"},
+			// Page example: https://www.amazon.com/dp/B0848MGRY8 (Whole Foods)
+			{"parentId":'rightCol',"getBy":"id"},
 			);
 		
 		// Decide which link to add:
@@ -885,11 +887,20 @@ http://stackoverflow.com/a/5947280/277601
 		pingForCamelCamelCamelData(ASIN);
 		// Add Fakespot results
 		pingForFakespotData();
+		var foundGraphLocation = false;
+		var miniGraphLocation = '';
 		for (var i = 0; i < domNodeOptionsForMiniCamelGraph.length; i++){
 			// console.log("Got here for " + domNodeOptionsForMiniCamelGraph[i].parentId);
 			res = addFakespotReport(results, domNodeOptionsForMiniCamelGraph[i]);
 			if (res) break;
+			foundGraphLocation = true;
+			miniGraphLocation = domNodeOptionsForMiniCamelGraph[i];
 		}
+		// if (!foundGraphLocation) {
+		// 	console.log('Could not find location to put graph');
+		// } else {
+		// 	console.log('Put graph with: ' + miniGraphLocation.parentId + ', ' + miniGraphLocation.getBy);
+		// }
 		
 		var camelDetails = {
 			'imgLink'   : strNewALink,
