@@ -1,6 +1,6 @@
 {
   "name": "Historic Price Shopper: Amazon Price Tracking",
-  "version": "0.27",
+  "version": "0.50",
   "manifest_version": 3,
   "description": "Adds Amazon.com historical price graph above the 'Add To Cart' button so you can monitor if it's a good time to buy.",
   "icons": {
@@ -16,14 +16,11 @@
   "content_scripts": [
     {
       "matches": [
-        "http://www.amazon.com/*",
-        "http://smile.amazon.com/*",
-        "http://amazon.com/*",
-        "http://www.amazon.co.uk/*",
-        "http://amazon.co.uk/*",
         "https://www.amazon.com/*",
         "https://smile.amazon.com/*",
         "https://amazon.com/*",
+        "https://www.amazon.ca/*",
+        "https://amazon.ca/*",
         "https://www.amazon.co.uk/*",
         "https://amazon.co.uk/*"
       ],
