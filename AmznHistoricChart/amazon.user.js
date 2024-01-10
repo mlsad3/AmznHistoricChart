@@ -1,9 +1,8 @@
 // ==UserScript==
 // @name           Historic Price Shopper
 // ==/UserScript==
-
 // https://stackoverflow.com/a/5947280/277601
-(function(amznhc, $, undefined) {
+const amznhc = (()=> {
 
 	// https://stackoverflow.com/a/24649134/277601
 	// Avoid recursive frame insertion...
@@ -67,7 +66,6 @@
 		});
 	}
 
-	
 	/** Get latest details from CamelCamelCamel
 	 *   Status will be:
 	 *     NONE - Ping again in 3 seconds
@@ -85,8 +83,8 @@
 			
 			switch(result.status){
 				case amazonccc.StatusEnum.DONE:
-					//if (debug) console.log("CCCStatus:DONE " + result.productGrade + " - " + result.companyGrade +
-					//	" - " + result.twStars + " - AGE: " + result.analysisAge);
+					if (debug) console.log("CCCStatus:DONE " + result.productGrade + " - " + result.companyGrade +
+						" - " + result.twStars + " - AGE: " + result.analysisAge);
 					UpdateCamelDetails(result);
 					break;
 				case amazonccc.StatusEnum.BAD:
@@ -301,7 +299,17 @@
 	  //div.appendChild(document.createElement('br'));
 	  //console.log("found " + domNodeOptions.parentId);
 	  domLoc.element.insertBefore(div, domLoc.siblingToPlaceBefore);
-	  if (domNodeOptions.addListener) div.addEventListener('DOMNodeRemovedFromDocument', onCamelRemove, false);
+	  if (domNodeOptions.addListener) {
+			const observer = new MutationObserver(mutations => {
+				for (const mutation of mutations) {
+					if (mutation.removedNodes.includes(div)) {
+						onCamelRemove();
+					}
+				}  
+			});
+			
+			observer.observe(div.parentNode, {childList: true});
+		}
 
 	  return true;
 	}
@@ -749,7 +757,7 @@
 	/**
 	 * Adds CamelCamelCamel graph and Fakespot results to Amazon webpage.
 	 * */
-	amznhc.addAmazonPriceGraph = function() {
+	addAmazonPriceGraph = function() {
 		// Check if it's already added:
 		if (isAlreadyAdded('MyMiniCamelChart')) {return;}
 		
@@ -948,6 +956,7 @@
 	 * */
 	function UpdateCamelDetails(result){
 		if (debug) console.log("Got Camel details");
+		if (debug) console.log(result)
 		// Based on which graphs are available, we will show in order of priority
 		var urlBase = "";
 		if (result.graphAmazonURL != null){
@@ -976,8 +985,10 @@
 		}
 	}
 	
-
+	return{
+		addAmazonPriceGraph,
+	}
 	// Close namespace amznhc (https://stackoverflow.com/a/5947280/277601)
-} ( window.amznhc = window.amznhc || {}, jQuery ));
+}) ();
 
 amznhc.addAmazonPriceGraph();
