@@ -103,7 +103,8 @@ const amazonccc = (function () {
         if (debug)
           console.log("Found graphAmazonURL as: " + ccc.graphAmazonURL);
       } else {
-        console.error("Quitting3 amazonccc.getPageHome Didn't find amazon");
+        if (debug)
+          console.error("Quitting3 amazonccc.getPageHome Didn't find amazon");
         ccc.graphAmazonURL = null;
       }
 
@@ -123,7 +124,8 @@ const amazonccc = (function () {
         }
         if (debug) console.log("Found graph3PNewURL as: " + ccc.graph3PNewURL);
       } else {
-        console.error("Quitting4 amazonccc.getPageHome Didn't find new");
+        if (debug)
+          console.error("Quitting4 amazonccc.getPageHome Didn't find new");
         ccc.graph3PNewURL = null;
       }
 
@@ -144,7 +146,8 @@ const amazonccc = (function () {
         if (debug)
           console.log("Found graph3PUsedURL as: " + ccc.graph3PUsedURL);
       } else {
-        console.error("Quitting5 amazonccc.getPageHome Didn't find old");
+        if (debug)
+          console.error("Quitting5 amazonccc.getPageHome Didn't find old");
         ccc.graph3PUsedURL = null;
       }
       ccc.graphSalesRankURL =

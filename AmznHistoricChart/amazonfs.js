@@ -115,8 +115,9 @@ const amazonfs = (function () {
         fsc.csrfToken = csrfToken;
         amazonfs.analyzeUrlForProductPage(fsc, callback);
       } else {
-        console.error(
-          "Quitting1 amazonfs.getPageHome (metaslength:" + metas.length + ")" //metas was not defined
+        if (debug)
+          console.error(
+            "Quitting1 amazonfs.getPageHome (metaslength:" + metas.length + ")" //metas was not defined
           // "Quitting1 amazonfs.getPageHome ( no csrfToken )"
         );
         fsc.status = amazonfs.StatusEnum.BAD;
@@ -204,7 +205,8 @@ const amazonfs = (function () {
         amazonfs.waitForPageGeneration(fsc, callback);
         return;
       }
-      console.error("Quitting1 amazonfs.analyzeUrlForProductPage");
+      if (debug)
+        console.error("Quitting1 amazonfs.analyzeUrlForProductPage");
       fsc.status = amazonfs.StatusEnum.BAD;
       callback(fsc);
     } catch (err) {
