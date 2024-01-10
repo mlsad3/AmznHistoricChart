@@ -299,7 +299,17 @@ const amznhc = (()=> {
 	  //div.appendChild(document.createElement('br'));
 	  //console.log("found " + domNodeOptions.parentId);
 	  domLoc.element.insertBefore(div, domLoc.siblingToPlaceBefore);
-	  if (domNodeOptions.addListener) div.addEventListener('DOMNodeRemovedFromDocument', onCamelRemove, false);
+	  if (domNodeOptions.addListener) {
+			const observer = new MutationObserver(mutations => {
+				for (const mutation of mutations) {
+					if (mutation.removedNodes.includes(div)) {
+						onCamelRemove();
+					}
+				}  
+			});
+			
+			observer.observe(div.parentNode, {childList: true});
+		}
 
 	  return true;
 	}
