@@ -97,12 +97,12 @@ const amazonfs = (function () {
 
       if (debug) console.log("Got status: " + response.status);
       if (debug) console.log("Got readyState: " + response.readyState);
-      // if (debug) console.log("Got text: " + response.text());
       if (!response.ok) {
         throw new Error("Request failed with status: " + response.status);
       }
 
       const text = await response.text();
+      if (debug) console.log("Got text: " + text);
 
       var csrfToken = "";
       var myRe = /meta\s+name="csrf-token"\s+content="([^"]+)"/;
@@ -252,12 +252,12 @@ const amazonfs = (function () {
 
       if (debug) console.log("Got status: " + response.status);
       if (debug) console.log("Got readyState: " + response.readyState);
-      // if (debug) console.log("Got text: " + response.text());
       if (!response.ok) {
         throw new Error(`Request failed with status ${response.status}`);
       }
 
       const text = await response.text();
+      if (debug) console.log("Got text: " + text);
 
       var eTag = response.headers.get("ETag");
       fsc.ETag = eTag;
@@ -329,12 +329,12 @@ const amazonfs = (function () {
 
       if (debug) console.log("Got status: " + response.status);
       if (debug) console.log("Got readyState: " + response.readyState);
-      if (debug) console.log("Got text: " + response.text());
       if (!response.ok) {
         throw new Error(`HTTP error ${response.status}`);
       }
 
       const text = await response.text();
+      if (debug) console.log("Got text: " + text);
 
       var eTag = response.headers.get("ETag");
       fsc.ETag = eTag;
@@ -400,12 +400,12 @@ const amazonfs = (function () {
 
       if (debug) console.log("Got status: " + response.status);
       if (debug) console.log("Got readyState: " + response.readyState);
-      if (debug) console.log("Got text: " + response.text());
       if (!response.ok) {
         throw new Error(`HTTP error ${response.status}`);
       }
 
       const text = await response.text();
+      if (debug) console.log("Got text: " + text);
 
       if (debug) console.log("Finished getting product page");
       var myCompGradeLineRe = /"company-grade-box[^"]+grade-([abcdfu])[^"]*"/i;
