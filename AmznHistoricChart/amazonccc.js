@@ -87,7 +87,7 @@ const amazonccc = (function () {
       }
 
       // value="amazon" id="price_type_0" checked="checked" disabled="disabled"
-      myRe = /value="amazon"\s*id="price_type_0"[^>]*>/i;
+      myRe = /value="amazon"\s*id="price_type_(0|amazon)"[^>]*>/i;
       result = myRe.exec(text);
       if (result != null && result.length > 0) {
         var disabledRe = /disabled="disabled"/i;
@@ -109,7 +109,7 @@ const amazonccc = (function () {
       }
 
       // value="new" id="price_type_1" checked="checked" disabled="disabled"
-      myRe = /value="new"\s*id="price_type_1"[^>]*>/i;
+      myRe = /value="new"\s*id="price_type_(1|new)"[^>]*>/i;
       result = myRe.exec(text);
       if (result != null && result.length > 0) {
         var disabledRe = /disabled="disabled"/i;
@@ -130,7 +130,7 @@ const amazonccc = (function () {
       }
 
       // value="used" id="price_type_2" checked="checked" disabled="disabled"
-      myRe = /value="used"\s*id="price_type_2"[^>]*>/i;
+      myRe = /value="used"\s*id="price_type_(2|used)"[^>]*>/i;
       result = myRe.exec(text);
       if (result != null && result.length > 0) {
         var disabledRe = /disabled="disabled"/i;
