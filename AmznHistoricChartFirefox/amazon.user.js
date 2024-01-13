@@ -1,0 +1,1 @@
+../AmznHistoricChart/amazon.user.js
