@@ -17,7 +17,6 @@ Right now the organization is ugly.
  - background.js - Fakespot.com uses http, so we cannot directly add an iFrame to Fakespot in Amazon's https site. This does any querying in the background, and passes the results via messages back to the user page
  - amazonfs.js - The heavy-lifting for Fakespot communication (used by background.js)
  - lru.js - https://github.com/rsms/js-lru, Least Recently Used cache for Fakespot caching
- - jquery - not being used currently
  - frame.html - I originally thought I would be adding this as an iframe to amazon page. Probably not anymore.
  - *.png - The images used when adding to the Chrome Extension store
  
